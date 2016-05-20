@@ -17,3 +17,7 @@ Clone this repository locally. All packages required are included in the reposit
 ### Lint
 
 `npm run -s lint`
+
+### Testing
+
+`npm -s test`
