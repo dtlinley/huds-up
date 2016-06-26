@@ -27,15 +27,23 @@ describe('Server', () => {
       name: 'barPlugin',
     };
 
+    const bazPlugin = {
+      register: () => {},
+    };
+    barPlugin.register.attributes = {
+      name: 'bazPlugin',
+    };
+
     const promise = proxyquire('../server', {
       http,
       fs: {
         readdir: (path, callback) => {
-          callback(undefined, ['foo.js', 'bar.js']);
+          callback(undefined, ['foo.js', 'bar.js', 'baz.js']);
         },
       },
       './plugins/foo': fooPlugin,
       './plugins/bar': barPlugin,
+      './plugins/baz': bazPlugin,
     });
 
     promise.then(srv => {
@@ -65,12 +73,17 @@ describe('Server', () => {
         http.get.withArgs({
           path: '/plugins/foo',
           port: process.env.PORT || 8080,
-        }).yields(undefined, { data: 'foo' });
+        }).yields(undefined, { data: 'foo', priority: 3 });
 
         http.get.withArgs({
           path: '/plugins/bar',
           port: process.env.PORT || 8080,
-        }).yields(undefined, { data: 'bar' });
+        }).yields(undefined, { data: 'bar', priority: 1 });
+
+        http.get.withArgs({
+          path: '/plugins/baz',
+          port: process.env.PORT || 8080,
+        }).yields(undefined, { data: 'baz', priority: 2 });
       });
 
       it('should respond with a 200 status code', done => {
@@ -92,15 +105,30 @@ describe('Server', () => {
             port: process.env.PORT || 8080,
           })).to.be.true;
 
+          expect(http.get.calledWith({
+            path: '/plugins/baz',
+            port: process.env.PORT || 8080,
+          })).to.be.true;
+
           done();
         });
       });
 
       it('should reply with an array of all the plugin thumbnail data', done => {
         server.inject(query).then(response => {
-          expect(response.result.length).to.equal(2);
-          expect(response.result).to.contain({ data: 'foo' });
-          expect(response.result).to.contain({ data: 'bar' });
+          expect(response.result.length).to.equal(3);
+          expect(response.result).to.contain({ data: 'foo', priority: 3 });
+          expect(response.result).to.contain({ data: 'bar', priority: 1 });
+          expect(response.result).to.contain({ data: 'baz', priority: 2 });
+          done();
+        });
+      });
+
+      it('should sort the data by priority (highest to lowest)', done => {
+        server.inject(query).then(response => {
+          expect(response.result[0].priority).to.equal(3);
+          expect(response.result[1].priority).to.equal(2);
+          expect(response.result[2].priority).to.equal(1);
           done();
         });
       });

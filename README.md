@@ -32,4 +32,4 @@ A Huds-up plugin is a [Hapi server](http://hapijs.com/api#server) defined by a s
 
 A plugin with identifier **"example"** (and therefore file name _/plugins/example_) is expected to define the following routes:
 
-* **GET** _/plugins/example_: Respond with an object containing all relevant data for the plugin. The data does not need to conform to any particular schema.
+* **GET** _/plugins/example_: Respond with an object containing all relevant data for the plugin. The data returned should include a `priority` field with a numerical value that represents how important the data being returned is (weather data may be more important if there will be rain, or it may be important to surface the length of time that has elapsed since the last time computer data was backed up); acceptable values are between 1 and 100, inclusive.

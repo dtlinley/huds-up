@@ -52,7 +52,7 @@ promise.then(srv => {
         }));
       });
       Promise.all(promises).then(
-        responses => reply(responses),
+        responses => reply(responses.sort((a, b) => b.priority - a.priority)),
         error => reply(`Error encountered while loading plugins: ${error}`)
       );
     },
