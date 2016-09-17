@@ -4,7 +4,7 @@
   "description": "A heads-up display for general life things.",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --reporter dot test",
+    "test": "eslint . && mocha --reporter dot test",
     "lint": "eslint ."
   },
   "author": "David Linley",

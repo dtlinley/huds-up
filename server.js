@@ -3,7 +3,7 @@ const http = require('http');
 const fs = require('fs');
 
 const plugins = [];
-const port = process.env.port || 8080;
+const port = process.env.port || 9010;
 const server = new Hapi.Server();
 server.connection({ port });
 

@@ -70,20 +70,17 @@ describe('Server', () => {
           url: '/plugins',
         };
 
-        http.get.withArgs({
+        http.get.withArgs(sinon.match({
           path: '/plugins/foo',
-          port: process.env.PORT || 8080,
-        }).yields(undefined, { data: 'foo', priority: 3 });
+        })).yields(undefined, { data: 'foo', priority: 3 });
 
-        http.get.withArgs({
+        http.get.withArgs(sinon.match({
           path: '/plugins/bar',
-          port: process.env.PORT || 8080,
-        }).yields(undefined, { data: 'bar', priority: 1 });
+        })).yields(undefined, { data: 'bar', priority: 1 });
 
-        http.get.withArgs({
+        http.get.withArgs(sinon.match({
           path: '/plugins/baz',
-          port: process.env.PORT || 8080,
-        }).yields(undefined, { data: 'baz', priority: 2 });
+        })).yields(undefined, { data: 'baz', priority: 2 });
       });
 
       it('should respond with a 200 status code', done => {
@@ -95,20 +92,17 @@ describe('Server', () => {
 
       it('should fetch thumbnail data from each registered plugin', done => {
         server.inject(query).then(() => {
-          expect(http.get.calledWith({
+          expect(http.get.calledWith(sinon.match({
             path: '/plugins/foo',
-            port: process.env.PORT || 8080,
-          })).to.be.true;
+          }))).to.be.true;
 
-          expect(http.get.calledWith({
+          expect(http.get.calledWith(sinon.match({
             path: '/plugins/bar',
-            port: process.env.PORT || 8080,
-          })).to.be.true;
+          }))).to.be.true;
 
-          expect(http.get.calledWith({
+          expect(http.get.calledWith(sinon.match({
             path: '/plugins/baz',
-            port: process.env.PORT || 8080,
-          })).to.be.true;
+          }))).to.be.true;
 
           done();
         });
