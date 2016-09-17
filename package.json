@@ -10,7 +10,8 @@
   "author": "David Linley",
   "license": "ISC",
   "dependencies": {
-    "hapi": "^13.4.0"
+    "hapi": "^13.4.0",
+    "wreck": "^10.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

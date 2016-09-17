@@ -5,11 +5,11 @@ const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 
 describe('Server', () => {
-  let http;
+  let wreck;
   let server;
 
   beforeEach(done => {
-    http = {
+    wreck = {
       get: sinon.stub(),
     };
 
@@ -35,7 +35,7 @@ describe('Server', () => {
     };
 
     const promise = proxyquire('../server', {
-      http,
+      wreck,
       fs: {
         readdir: (path, callback) => {
           callback(undefined, ['foo.js', 'bar.js', 'baz.js']);
@@ -70,17 +70,14 @@ describe('Server', () => {
           url: '/plugins',
         };
 
-        http.get.withArgs(sinon.match({
-          path: '/plugins/foo',
-        })).yields(undefined, { data: 'foo', priority: 3 });
+        wreck.get.withArgs(sinon.match('/plugins/foo'))
+        .yields(undefined, undefined, JSON.stringify({ data: 'foo', priority: 3 }));
 
-        http.get.withArgs(sinon.match({
-          path: '/plugins/bar',
-        })).yields(undefined, { data: 'bar', priority: 1 });
+        wreck.get.withArgs(sinon.match('/plugins/bar'))
+        .yields(undefined, undefined, JSON.stringify({ data: 'bar', priority: 1 }));
 
-        http.get.withArgs(sinon.match({
-          path: '/plugins/baz',
-        })).yields(undefined, { data: 'baz', priority: 2 });
+        wreck.get.withArgs(sinon.match('/plugins/baz'))
+        .yields(undefined, undefined, JSON.stringify({ data: 'baz', priority: 2 }));
       });
 
       it('should respond with a 200 status code', done => {
@@ -92,17 +89,11 @@ describe('Server', () => {
 
       it('should fetch thumbnail data from each registered plugin', done => {
         server.inject(query).then(() => {
-          expect(http.get.calledWith(sinon.match({
-            path: '/plugins/foo',
-          }))).to.be.true;
+          expect(wreck.get.calledWith(sinon.match('/plugins/foo'))).to.be.true;
 
-          expect(http.get.calledWith(sinon.match({
-            path: '/plugins/bar',
-          }))).to.be.true;
+          expect(wreck.get.calledWith(sinon.match('/plugins/bar'))).to.be.true;
 
-          expect(http.get.calledWith(sinon.match({
-            path: '/plugins/baz',
-          }))).to.be.true;
+          expect(wreck.get.calledWith(sinon.match('/plugins/baz'))).to.be.true;
 
           done();
         });

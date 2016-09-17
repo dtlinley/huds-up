@@ -1,6 +1,6 @@
 const Hapi = require('hapi');
-const http = require('http');
 const fs = require('fs');
+const wreck = require('wreck');
 
 const plugins = [];
 const port = process.env.port || 9010;
@@ -40,20 +40,18 @@ promise.then(srv => {
       const promises = [];
       plugins.forEach(plugin => {
         promises.push(new Promise((resolve, reject) => {
-          http.get({
-            path: `/plugins/${plugin}`,
-            port,
-          }, (error, result) => {
-            if (error) {
-              return reject(error);
+          wreck.get(`${srv.info.uri}/plugins/${plugin}`, null, (err, response, payload) => {
+            if (err) {
+              return reject(err);
             }
-            return resolve(result);
+            return resolve(JSON.parse(payload));
           });
         }));
       });
       Promise.all(promises).then(
         responses => reply(responses.sort((a, b) => b.priority - a.priority)),
-        error => reply(`Error encountered while loading plugins: ${error}`)
+        error => reply(`Error encountered while loading plugins:
+          ${error.statusCode} ${error.statusMessage} ${error.req.path}`)
       );
     },
   });
