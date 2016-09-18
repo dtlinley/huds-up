@@ -8,7 +8,7 @@
     "url": "git://github.com/dtlinley/huds-up.git"
   },
   "scripts": {
-    "test": "eslint . && mocha --reporter dot test",
+    "test": "eslint . && NODE_ENV=test mocha --reporter dot test",
     "lint": "eslint ."
   },
   "author": "David Linley",

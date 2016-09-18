@@ -63,6 +63,7 @@ describe('Server', () => {
   describe('plugin API', () => {
     describe('#query', () => {
       let query;
+      let getSpy;
 
       beforeEach(() => {
         query = {
@@ -70,7 +71,7 @@ describe('Server', () => {
           url: '/plugins',
         };
 
-        wreck.get.withArgs(sinon.match('/plugins/foo'))
+        getSpy = wreck.get.withArgs(sinon.match('/plugins/foo'))
         .yields(undefined, undefined, JSON.stringify({ data: 'foo', priority: 3 }));
 
         wreck.get.withArgs(sinon.match('/plugins/bar'))
@@ -115,6 +116,22 @@ describe('Server', () => {
           expect(response.result[1].priority).to.equal(2);
           expect(response.result[2].priority).to.equal(1);
           done();
+        });
+      });
+
+      describe('when a plugin responds with 0 priority', () => {
+        beforeEach(() => {
+          getSpy
+          .yields(undefined, undefined, JSON.stringify({ data: 'foo', priority: 0 }));
+        });
+
+        it('should filter out that response from the list', done => {
+          server.inject(query).then(response => {
+            expect(response.result.length).to.equal(2);
+            expect(response.result).to.contain({ data: 'bar', priority: 1 });
+            expect(response.result).to.contain({ data: 'baz', priority: 2 });
+            done();
+          });
         });
       });
     });
