@@ -14,6 +14,7 @@
   "author": "David Linley",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^2.0.0",
     "hapi": "^13.4.0",
     "wreck": "^10.0.0"
   },
