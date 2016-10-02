@@ -3,5 +3,8 @@ module.exports = {
     "installedESLint": true,
     "plugins": [
         "react"
-    ]
+    ],
+    "rules": {
+      "strict": "off",
+    },
 };
