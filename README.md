@@ -20,11 +20,15 @@ This project uses Dotenv to provide environment variables that are required for 
 
 ### Lint
 
-`npm run -s lint`
+`npm run lint`
 
 ### Testing
 
 `npm test`
+
+### Make A New Plugin
+
+`npm run new-plugin -- <plugin name>`
 
 ### Plugins
 

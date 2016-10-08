@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "eslint . && NODE_ENV=test mocha --reporter dot --recursive test",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "new-plugin": "node generator/add-plugin.js"
   },
   "author": "David Linley",
   "license": "ISC",
