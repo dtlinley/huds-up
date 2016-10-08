@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 function copyTemplates() {
-  const pluginName = process.argv[2];
+  const pluginName = process.argv[2] || 'new-plugin';
   const camelCasePlugin = pluginName
     .replace(/(\-[a-z])/g, ($1) => $1.replace('-', '').toUpperCase());
 
