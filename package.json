@@ -3,14 +3,20 @@
   "version": "1.0.0",
   "description": "A heads-up display for general life things.",
   "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dtlinley/huds-up.git"
+  },
   "scripts": {
-    "test": "eslint . && mocha --reporter dot test",
+    "test": "eslint . && NODE_ENV=test mocha --reporter dot --recursive test",
     "lint": "eslint ."
   },
   "author": "David Linley",
   "license": "ISC",
   "dependencies": {
-    "hapi": "^13.4.0"
+    "dotenv": "^2.0.0",
+    "hapi": "^13.4.0",
+    "wreck": "^10.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -8,6 +8,10 @@ A simple dashboard for life.
 
 Clone this repository locally. All packages required are included in the repository.
 
+### Environment Variables
+
+This project uses Dotenv to provide environment variables that are required for this project to run. The _.env.example_ file contains a list of the environment variables used in this project as well as sane defaults for them (where possible).
+
 ### Running
 
 `npm start`
@@ -32,4 +36,4 @@ A Huds-up plugin is a [Hapi server](http://hapijs.com/api#server) defined by a s
 
 A plugin with identifier **"example"** (and therefore file name _/plugins/example_) is expected to define the following routes:
 
-* **GET** _/plugins/example_: Respond with an object containing all relevant data for the plugin. The data returned should include a `priority` field with a numerical value that represents how important the data being returned is (weather data may be more important if there will be rain, or it may be important to surface the length of time that has elapsed since the last time computer data was backed up); acceptable values are between 1 and 100, inclusive.
+* **GET** _/plugins/example_: Respond with an object containing all relevant data for the plugin. The data returned should include a `priority` field with a numerical value that represents how important the data being returned is (weather data may be more important if there will be rain, or it may be important to surface the length of time that has elapsed since the last time computer data was backed up); acceptable values are between 0 and 100, inclusive. A priority value of 100 is considered highest importance; a priority value of 0 indicates that the plugin response should be ignored. Also expected to respond with a `type` field with a unique string identifying which plugin is responding.
