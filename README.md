@@ -12,6 +12,9 @@ Clone this repository locally. All packages required are included in the reposit
 
 This project uses Dotenv to provide environment variables that are required for this project to run. The _.env.example_ file contains a list of the environment variables used in this project as well as sane defaults for them (where possible).
 
+* **BACKINTIME_DIR**: A file path to a directory where backups are stored with the [Back In Time](http://backintime.le-web.org/) software. Back In Time produces a directory per-backup performed, and the directory is named in a predictable way that indicates when the snapshot was made (YYYYMMDD-HHMMSS-SEQ where SEQ is some sort of sequence number). Omitting a value for this will remove Back In Time backup results from the results returned from `/plugins`.
+* **TTC_ROUTES_STATIONS**: A comma-separated list of Toronto Transit Commission (TTC) routes or stops (including subway, streetcar and bus) that are of interest to the user (typically routes on the commute of the user).
+
 ### Running
 
 `npm start`
