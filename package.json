@@ -18,6 +18,7 @@
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
     "hapi": "^13.4.0",
+    "node-df": "^0.1.1",
     "wreck": "^10.0.0"
   },
   "devDependencies": {
