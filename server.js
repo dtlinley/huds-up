@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 const plugins = [];
-const port = process.env.port || 9010;
+const port = process.env.PORT;
 const server = new Hapi.Server();
 server.connection({ port });
 

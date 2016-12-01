@@ -7,8 +7,11 @@ const sinon = require('sinon');
 describe('Server', () => {
   let wreck;
   let server;
+  let port;
 
   beforeEach(done => {
+    port = process.env.PORT;
+    process.env.PORT = 0;
     wreck = {
       get: sinon.stub(),
     };
@@ -53,6 +56,7 @@ describe('Server', () => {
   });
 
   afterEach(done => {
+    process.env.PORT = port;
     server.stop({}, done);
   });
 
