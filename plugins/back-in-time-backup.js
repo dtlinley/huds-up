@@ -29,13 +29,13 @@ function dateFromBackup(backup) {
   const time = split[1];
   const ret = new Date();
 
-  ret.setUTCFullYear(
+  ret.setFullYear(
     parseInt(date.substring(0, 4), 10),
     parseInt(date.substring(4, 6), 10) - 1,
     parseInt(date.substring(6, 8), 10)
   );
 
-  ret.setUTCHours(
+  ret.setHours(
     parseInt(time.substring(0, 2), 10),
     parseInt(time.substring(2, 4), 10),
     parseInt(time.substring(4, 6), 10)
@@ -68,7 +68,7 @@ exports.register = (server, options, next) => {
       }
 
       return fs.readdir(process.env.BACKINTIME_DIR, (err, files) => {
-        const response = { priority: 0, type: 'backup.backintime', data: {} };
+        const response = { priority: 0, type: 'backup-backintime', data: {} };
         let msg;
 
         if (err) {
