@@ -33,7 +33,7 @@ describe('Server', () => {
     const bazPlugin = {
       register: () => {},
     };
-    barPlugin.register.attributes = {
+    bazPlugin.register.attributes = {
       name: 'bazPlugin',
     };
 

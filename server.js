@@ -3,7 +3,7 @@ const fs = require('fs');
 const wreck = require('wreck');
 const dotenv = require('dotenv');
 
-dotenv.config();
+dotenv.config({ silent: true });
 const plugins = [];
 const port = process.env.PORT;
 const server = new Hapi.Server();
