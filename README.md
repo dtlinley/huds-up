@@ -15,6 +15,8 @@ This project uses Dotenv to provide environment variables that are required for 
 * **BACKINTIME_DIR**: A file path to a directory where backups are stored with the [Back In Time](http://backintime.le-web.org/) software. Back In Time produces a directory per-backup performed, and the directory is named in a predictable way that indicates when the snapshot was made (YYYYMMDD-HHMMSS-SEQ where SEQ is some sort of sequence number). Omitting a value for this will remove Back In Time backup results from the results returned from `/plugins`.
 * **TTC_ROUTES_STATIONS**: A comma-separated list of Toronto Transit Commission (TTC) routes or stops (including subway, streetcar and bus) that are of interest to the user (typically routes on the commute of the user).
 * **DISK_FREE_MOUNTS**: A comma-separated list of mount points for disks that the user wants to monitor for getting over-full. Any mount points added to this list should match the mount points given by the `df` command.
+* **WEATHER_CITY_ID**: An Open Weather Map city ID. You can look up the ID of your city [here](http://openweathermap.org/city). If omitted then weather data will not be fetched.
+* **OPEN_WEATHER_MAP_API_KEY**: An Open Weather Map API key. You can get one [here](https://home.openweathermap.org/users/sign_up). If omitted then weather data will not be fetched.
 
 ### Running
 
