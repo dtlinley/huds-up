@@ -79,7 +79,7 @@ describe('Back In Time Backup Plugin', () => {
 
       it('should respond with priority 0', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.equal(0);
+          expect(response.result.priority).to.equal(0);
           done();
         });
       });
@@ -99,8 +99,8 @@ describe('Back In Time Backup Plugin', () => {
 
       it('should respond with a high priority message (not able to read location)', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(70);
-          expect(JSON.parse(response.payload).data.message).to.include('Filesystem error');
+          expect(response.result.priority).to.be.above(70);
+          expect(response.result.data.message).to.include('Filesystem error');
           done();
         });
       });
@@ -120,8 +120,8 @@ describe('Back In Time Backup Plugin', () => {
 
       it('should respond with a high priority message about no backups', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(70);
-          expect(JSON.parse(response.payload).data.message).to.include('No backups found');
+          expect(response.result.priority).to.be.above(70);
+          expect(response.result.data.message).to.include('No backups found');
           done();
         });
       });
@@ -138,7 +138,7 @@ describe('Back In Time Backup Plugin', () => {
 
       it('should respond with a very low priority message', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.below(15);
+          expect(response.result.priority).to.be.below(15);
           done();
         });
       });
@@ -155,7 +155,7 @@ describe('Back In Time Backup Plugin', () => {
 
       it('should respond with a higher priority message', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(30);
+          expect(response.result.priority).to.be.above(30);
           done();
         });
       });
@@ -168,7 +168,7 @@ describe('Back In Time Backup Plugin', () => {
         ]);
 
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(50);
+          expect(response.result.priority).to.be.above(50);
           done();
         });
       });
@@ -187,7 +187,7 @@ describe('Back In Time Backup Plugin', () => {
 
       it('should not return the same priority as if they weren\'t there', done => {
         server.inject(query).then(response => {
-          const withGarbage = JSON.parse(response.payload).priority;
+          const withGarbage = response.result.priority;
           fs.readdir.yields(undefined, [
             '20160114-160000-123',
             '20160113-160000-123',
@@ -215,7 +215,7 @@ describe('Back In Time Backup Plugin', () => {
 
       it('should disregard any future backups', done => {
         server.inject(query).then(response => {
-          const withFuture = JSON.parse(response.payload).priority;
+          const withFuture = response.result.priority;
           fs.readdir.yields(undefined, [
             '20160113-110000-123',
             '20160112-010000-123',

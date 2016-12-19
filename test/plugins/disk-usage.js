@@ -74,14 +74,14 @@ describe('Disk Usage Plugin', () => {
 
       it('should respond with the percent usage of the filesystem', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.filesystems[0].capacity).to.equal(0.9);
+          expect(response.result.data.filesystems[0].capacity).to.equal(0.9);
           done();
         });
       });
 
       it('should respond with only the data for that filesystem', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.filesystems.length).to.equal(1);
+          expect(response.result.data.filesystems.length).to.equal(1);
           done();
         });
       });
@@ -93,8 +93,8 @@ describe('Disk Usage Plugin', () => {
 
         it('should respond with a low-priority message', done => {
           server.inject(query).then(response => {
-            expect(JSON.parse(response.payload).priority).to.be.below(5);
-            expect(JSON.parse(response.payload).priority).to.be.above(0);
+            expect(response.result.priority).to.be.below(5);
+            expect(response.result.priority).to.be.above(0);
             done();
           });
         });
@@ -107,8 +107,8 @@ describe('Disk Usage Plugin', () => {
 
         it('should respond with a low-to-medium priority message', done => {
           server.inject(query).then(response => {
-            expect(JSON.parse(response.payload).priority).to.be.below(20);
-            expect(JSON.parse(response.payload).priority).to.be.above(0);
+            expect(response.result.priority).to.be.below(20);
+            expect(response.result.priority).to.be.above(0);
             done();
           });
         });
@@ -121,8 +121,8 @@ describe('Disk Usage Plugin', () => {
 
         it('should respond with a semi-high priority message', done => {
           server.inject(query).then(response => {
-            expect(JSON.parse(response.payload).priority).to.be.below(90);
-            expect(JSON.parse(response.payload).priority).to.be.above(50);
+            expect(response.result.priority).to.be.below(90);
+            expect(response.result.priority).to.be.above(50);
             done();
           });
         });
@@ -136,7 +136,7 @@ describe('Disk Usage Plugin', () => {
 
       it('should respond with a 0 priority message', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.equal(0);
+          expect(response.result.priority).to.equal(0);
           done();
         });
       });
@@ -149,7 +149,7 @@ describe('Disk Usage Plugin', () => {
 
       it('should respond with a high priority message', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(80);
+          expect(response.result.priority).to.be.above(80);
           done();
         });
       });
@@ -163,7 +163,7 @@ describe('Disk Usage Plugin', () => {
 
       it('should respond with a high priority message', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(80);
+          expect(response.result.priority).to.be.above(80);
           done();
         });
       });
@@ -176,25 +176,25 @@ describe('Disk Usage Plugin', () => {
 
       it('should respond with the name of each filesystem', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.filesystems.length).to.equal(2);
-          expect(JSON.parse(response.payload).data.filesystems[0].filesystem).to.equal('/dev/foo');
-          expect(JSON.parse(response.payload).data.filesystems[1].filesystem).to.equal('/dev/bar');
+          expect(response.result.data.filesystems.length).to.equal(2);
+          expect(response.result.data.filesystems[0].filesystem).to.equal('/dev/foo');
+          expect(response.result.data.filesystems[1].filesystem).to.equal('/dev/bar');
           done();
         });
       });
 
       it('should respond with the percent usage of each filesystem', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.filesystems[0].capacity).to.equal(0.9);
-          expect(JSON.parse(response.payload).data.filesystems[1].capacity).to.equal(0.1);
+          expect(response.result.data.filesystems[0].capacity).to.equal(0.9);
+          expect(response.result.data.filesystems[1].capacity).to.equal(0.1);
           done();
         });
       });
 
       it('should respond with the mount point of each filesystem', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.filesystems[0].mount).to.equal('/mnt/foo');
-          expect(JSON.parse(response.payload).data.filesystems[1].mount).to.equal('/home/bar');
+          expect(response.result.data.filesystems[0].mount).to.equal('/mnt/foo');
+          expect(response.result.data.filesystems[1].mount).to.equal('/home/bar');
           done();
         });
       });
@@ -207,8 +207,8 @@ describe('Disk Usage Plugin', () => {
 
         it('should respond with a low-priority message', done => {
           server.inject(query).then(response => {
-            expect(JSON.parse(response.payload).priority).to.be.below(5);
-            expect(JSON.parse(response.payload).priority).to.be.above(0);
+            expect(response.result.priority).to.be.below(5);
+            expect(response.result.priority).to.be.above(0);
             done();
           });
         });
@@ -222,8 +222,8 @@ describe('Disk Usage Plugin', () => {
 
         it('should respond with a semi-high priority message', done => {
           server.inject(query).then(response => {
-            expect(JSON.parse(response.payload).priority).to.be.below(90);
-            expect(JSON.parse(response.payload).priority).to.be.above(70);
+            expect(response.result.priority).to.be.below(90);
+            expect(response.result.priority).to.be.above(70);
             done();
           });
         });
@@ -237,8 +237,8 @@ describe('Disk Usage Plugin', () => {
 
         it('should respond with a low-to-medium priority message', done => {
           server.inject(query).then(response => {
-            expect(JSON.parse(response.payload).priority).to.be.below(50);
-            expect(JSON.parse(response.payload).priority).to.be.above(0);
+            expect(response.result.priority).to.be.below(50);
+            expect(response.result.priority).to.be.above(0);
             done();
           });
         });

@@ -34,7 +34,7 @@ describe('templatePlugin Plugin', () => {
   describe('#GET /plugins/template-plugin', () => {
     it('should return a priority 0 payload', done => {
       server.inject(query).then(response => {
-        expect(JSON.parse(response.payload).priority).to.equal(0);
+        expect(response.result.priority).to.equal(0);
         done();
       });
     });
