@@ -7,7 +7,7 @@ const wreck = require('wreck').defaults({ json: true });
 const FORECAST_RELEVANCE = 4;
 const DEPRESSION_FACTOR = 2.5; // if there's rain soon then later rain is less important by a factor
 const INITIAL_IMPORTANCE = 50; // if it will rain heavily in the next 3 hours, how important is that
-const HIGH_RAIN_THRESHOLD = 20; // how many mm of rain are considered "a lot" of rain
+const HIGH_RAIN_THRESHOLD = 4; // how many mm of rain are considered "a lot" of rain in 3 hours
 
 exports.register = (server, options, next) => {
   server.route({
