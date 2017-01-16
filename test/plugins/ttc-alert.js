@@ -50,15 +50,15 @@ describe('ttcAlert Plugin', () => {
 
       it('should respond with a high priority payload', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(60);
+          expect(response.result.priority).to.be.above(60);
           done();
         });
       });
 
       it('should send the network error back with the response', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.error.status).to.equal(404);
-          expect(JSON.parse(response.payload).data.error.statusMessage).to.equal('Not found');
+          expect(response.result.data.error.status).to.equal(404);
+          expect(response.result.data.error.statusMessage).to.equal('Not found');
           done();
         });
       });
@@ -79,14 +79,14 @@ describe('ttcAlert Plugin', () => {
 
       it('should respond with a low priority message', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.below(20);
+          expect(response.result.priority).to.be.below(20);
           done();
         });
       });
 
       it('should respond with an empty array of alerts', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.alerts.length).to.equal(0);
+          expect(response.result.data.alerts.length).to.equal(0);
           done();
         });
       });
@@ -107,15 +107,15 @@ describe('ttcAlert Plugin', () => {
 
       it('should respond with a high priority message', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).priority).to.be.above(70);
+          expect(response.result.priority).to.be.above(70);
           done();
         });
       });
 
       it('should include the whole alert in the response', done => {
         server.inject(query).then(response => {
-          expect(JSON.parse(response.payload).data.alerts.length).to.equal(2);
-          expect(JSON.parse(response.payload).data.alerts[0]).to.equal(
+          expect(response.result.data.alerts.length).to.equal(2);
+          expect(response.result.data.alerts[0]).to.equal(
             'Elevator Alert: Jane Station, WB platform to concourse level, elevator is out of  service.' // eslint-disable-line max-len
           );
           done();
