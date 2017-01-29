@@ -60,7 +60,7 @@ exports.register = (server, options, next) => {
         };
 
         const priority = importance(rain, INITIAL_IMPORTANCE, 1);
-        if (priority <= 0) {
+        if (priority < 2) {
           response.priority = 2;
           response.data.message = 'Skies are clear';
         } else {
