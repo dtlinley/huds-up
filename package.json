@@ -10,7 +10,8 @@
   "scripts": {
     "test": "eslint . && NODE_ENV=test mocha --reporter dot --recursive test",
     "lint": "eslint .",
-    "new-plugin": "node generator/add-plugin.js"
+    "new-plugin": "node generator/add-plugin.js",
+    "debug": "node debug ."
   },
   "author": "David Linley",
   "license": "ISC",
