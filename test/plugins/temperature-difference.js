@@ -5,7 +5,7 @@ const Hapi = require('hapi');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
-describe.only('temperatureDifference Plugin', () => {
+describe('temperatureDifference Plugin', () => {
   let query;
   let server;
   let wreck;
@@ -16,14 +16,14 @@ describe.only('temperatureDifference Plugin', () => {
   let todayMorning;
   let yesterdayMorning;
   let yesterdayNight;
-  let WEATHER_CITY_ID;
-  let OPEN_WEATHER_MAP_API_KEY;
+  let WEATHER_CITY_COORDS;
+  let DARKSKY_API_KEY;
 
   beforeEach(() => {
-    WEATHER_CITY_ID = process.env.WEATHER_CITY_ID;
-    OPEN_WEATHER_MAP_API_KEY = process.env.OPEN_WEATHER_MAP_API_KEY;
-    process.env.WEATHER_CITY_ID = 1234;
-    process.env.OPEN_WEATHER_MAP_API_KEY = 'foobarapikey';
+    WEATHER_CITY_COORDS = process.env.WEATHER_CITY_COORDS;
+    DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
+    process.env.WEATHER_CITY_COORDS = '12,-34';
+    process.env.DARKSKY_API_KEY = 'foobarapikey';
 
     query = '/plugins/temperature-difference';
 
@@ -43,7 +43,7 @@ describe.only('temperatureDifference Plugin', () => {
     server.register(plugin);
 
     forecastQuery = wreck.get
-    .withArgs('http://api.openweathermap.org/data/2.5/forecast?id=1234&APPID=foobarapikey');
+    .withArgs('https://api.darksky.net/forecast/foobarapikey/12,-34');
 
     forecastQuery.yields(null, null);
 
@@ -57,14 +57,14 @@ describe.only('temperatureDifference Plugin', () => {
   });
 
   afterEach(() => {
-    process.env.WEATHER_CITY_ID = WEATHER_CITY_ID;
-    process.env.OPEN_WEATHER_MAP_API_KEY = OPEN_WEATHER_MAP_API_KEY;
+    process.env.WEATHER_CITY_COORDS = WEATHER_CITY_COORDS;
+    process.env.DARKSKY_API_KEY = DARKSKY_API_KEY;
   });
 
   describe('#GET /plugins/temperature-difference', () => {
     it('should get weather forecast for the next couple of days', () => {
       server.inject(query);
-      expect(wreck.get.calledWith('http://api.openweathermap.org/data/2.5/forecast?id=1234&APPID=foobarapikey')).to.be.true;
+      expect(wreck.get.calledWith('https://api.darksky.net/forecast/foobarapikey/12,-34')).to.be.true;
     });
 
     describe('in the evening or later', () => {
@@ -75,7 +75,7 @@ describe.only('temperatureDifference Plugin', () => {
         clock = sinon.useFakeTimers(today.getTime());
 
         historyQuery = wreck.get
-        .withArgs(`http://api.openweathermap.org/data/2.5/history/city?id=1234&APPID=foobarapikey&type=hour&start=${todayMorning.getTime()}`);
+        .withArgs(`https://api.darksky.net/forecast/foobarapikey/12,-34,${todayMorning.getTime()}`);
 
         historyQuery.yields(null, null);
       });
@@ -87,7 +87,7 @@ describe.only('temperatureDifference Plugin', () => {
       it('should compare tomorrow\'s forecast to what happened today', (done) => {
         server.inject(query).then(() => {
           server.inject(query).then(() => {
-            expect(wreck.get.calledWith(`http://api.openweathermap.org/data/2.5/history/city?id=1234&APPID=foobarapikey&type=hour&start=${todayMorning.getTime()}`)).to.be.true;
+            expect(wreck.get.calledWith(`https://api.darksky.net/forecast/foobarapikey/12,-34,${todayMorning.getTime()}`)).to.be.true;
             done();
           });
         });
