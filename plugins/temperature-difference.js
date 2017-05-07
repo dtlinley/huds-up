@@ -24,7 +24,7 @@ exports.register = (server, options, next) => {
       const response = { priority: 0, type: 'temperature-difference', data: {} };
 
       let prior = Promise.resolve({});
-      if ((new Date()).getHours() >= EVENING_HOUR) {
+      if ((new Date()).getHours() < EVENING_HOUR) {
         const date = new Date();
         date.setDate(date.getDate() - 1);
         const start = Math.floor(date.getTime() / 1000);
@@ -53,7 +53,7 @@ exports.register = (server, options, next) => {
         let current = forecastData[0];
         let upcoming = forecastData[1];
 
-        if ((new Date()).getHours() >= EVENING_HOUR) {
+        if ((new Date()).getHours() < EVENING_HOUR) {
           current = priorData;
           upcoming = forecastData[0];
         }
