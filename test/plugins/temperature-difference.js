@@ -5,14 +5,14 @@ const Hapi = require('hapi');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
-describe.only('temperatureDifference Plugin', () => {
+describe('temperatureDifference Plugin', () => {
   let query;
   let server;
   let wreck;
   let clock;
+  let forecastStub;
 
   let today;
-  let yesterdayTime;
   let WEATHER_CITY_COORDS;
   let DARKSKY_API_KEY;
 
@@ -40,9 +40,7 @@ describe.only('temperatureDifference Plugin', () => {
     server.register(plugin);
 
     today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterdayTime = Math.floor(yesterday.getTime() / 1000);
+    forecastStub = wreck.get.withArgs('https://api.darksky.net/forecast/foobarapikey/12,-34?units=ca', sinon.match.func);
   });
 
   afterEach(() => {
@@ -56,37 +54,51 @@ describe.only('temperatureDifference Plugin', () => {
     beforeEach(() => {
       data = {
         daily: {
-          data: [
-            { apparentTemperatureMin: 15, apparentTemperatureMax: 25 },
-          ],
+          data: [],
         },
       };
-      wreck.get.yields(null, null, data);
+      forecastStub.yields(null, { statusCode: 200 }, data);
     });
 
     it('should get the weather forecast', () => {
       server.inject(query);
-      expect(wreck.get.calledWith(`https://api.darksky.net/forecast/foobarapikey/12,-34,${yesterdayTime}&units=ca`)).to.be.true;
+      expect(forecastStub.called).to.be.true;
     });
 
     describe('in the evening or later', () => {
+      let priorStub;
+
       beforeEach(() => {
         today.setHours(19);
         clock = sinon.useFakeTimers(today.getTime());
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayTime = Math.floor(yesterday.getTime() / 1000);
+        priorStub = wreck.get.withArgs(`https://api.darksky.net/forecast/foobarapikey/12,-34,${yesterdayTime}?units=ca`, sinon.match.func);
       });
 
       afterEach(() => {
         clock.restore();
       });
 
+      it('should get the weather history', () => {
+        server.inject(query);
+        expect(priorStub.called).to.be.true;
+      });
+
       describe('when today was pleasant', () => {
         beforeEach(() => {
-          data.daily.data.push({ apparentTemperatureMin: 15, apparentTemperatureMax: 25 });
+          priorStub.yields(null, { statusCode: 200 }, {
+            daily: {
+              data: [{ apparentTemperatureMin: 15, apparentTemperatureMax: 25 }],
+            },
+          });
         });
 
         describe('and tomorrow will be pleasant again', () => {
           beforeEach(() => {
             data.daily.data.push({ apparentTemperatureMin: 15, apparentTemperatureMax: 25 });
+            data.daily.data.push({});
           });
 
           it('should respond with a low priority message', (done) => {
@@ -100,6 +112,7 @@ describe.only('temperatureDifference Plugin', () => {
         describe('and tomorrow\'s temperatures will be further from pleasant', () => {
           beforeEach(() => {
             data.daily.data.push({ apparentTemperatureMin: 10, apparentTemperatureMax: 20 });
+            data.daily.data.push({});
           });
 
           it('should respond with a medium priority message', (done) => {
@@ -111,7 +124,7 @@ describe.only('temperatureDifference Plugin', () => {
 
           describe('by a significant amount', () => {
             beforeEach(() => {
-              data.daily.data[2] = { apparentTemperatureMin: -5, apparentTemperatureMax: 5 };
+              data.daily.data[0] = { apparentTemperatureMin: -5, apparentTemperatureMax: 5 };
             });
 
             it('should respond with a high priority message', (done) => {
@@ -126,19 +139,21 @@ describe.only('temperatureDifference Plugin', () => {
 
       describe('when today was not pleasant', () => {
         beforeEach(() => {
-          data.daily.data.push({ apparentTemperatureMin: 5, apparentTemperatureMax: 15 });
+          priorStub.yields(null, { statusCode: 200 }, { daily: {
+            data: [{ apparentTemperatureMin: 5, apparentTemperatureMax: 15 }] },
+          });
         });
 
         describe('and tomorrow will be less pleasant', () => {
           beforeEach(() => {
             data.daily.data.push({ apparentTemperatureMin: 0, apparentTemperatureMax: 10 });
+            data.daily.data.push({});
           });
 
           it('should respond with a higher priority than if tomorrow is more pleasant', (done) => {
             server.inject(query).then((lessPleasantResponse) => {
               const unpleasantPriority = lessPleasantResponse.result.priority;
-              data.daily.data[2] = { apparentTemperatureMin: 10, apparentTemperatureMax: 20 };
-              wreck.get.yields(null, null, data);
+              data.daily.data[0] = { apparentTemperatureMin: 10, apparentTemperatureMax: 20 };
               server.inject(query).then((morePleasantResponse) => {
                 const pleasantPriority = morePleasantResponse.result.priority;
                 expect(pleasantPriority).to.be.below(unpleasantPriority);
@@ -155,6 +170,7 @@ describe.only('temperatureDifference Plugin', () => {
         today.setHours(7);
         clock = sinon.useFakeTimers(today.getTime());
 
+        data.daily.data.push({ apparentTemperatureMin: 15, apparentTemperatureMax: 25 });
         data.daily.data.push({ apparentTemperatureMin: 10, apparentTemperatureMax: 20 });
       });
 
