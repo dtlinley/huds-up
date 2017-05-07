@@ -6,7 +6,7 @@ const MAX_PRIORITY = 80;
 const LARGE_TEMPERATURE_DIFFERENCE = 30;
 const IDEAL_TEMP_MIN = 20;
 const IDEAL_TEMP_MAX = 30;
-const EVENING_HOUR = 18;
+const EVENING_HOUR = 16;
 
 exports.register = (server, options, next) => {
   server.route({
