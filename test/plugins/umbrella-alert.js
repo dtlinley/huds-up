@@ -6,16 +6,16 @@ const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
 describe('Umbrella Alert Plugin', () => {
-  let WEATHER_CITY_ID;
-  let OPEN_WEATHER_MAP_API_KEY;
+  let WEATHER_CITY_COORDS;
+  let DARKSKY_API_KEY;
   let query;
   let server;
   let wreck;
   let data;
 
   beforeEach(done => {
-    WEATHER_CITY_ID = process.env.WEATHER_CITY_ID;
-    OPEN_WEATHER_MAP_API_KEY = process.env.OPEN_WEATHER_MAP_API_KEY;
+    WEATHER_CITY_COORDS = process.env.WEATHER_CITY_COORDS;
+    DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
     query = '/plugins/umbrella-alert';
 
     server = new Hapi.Server();
@@ -42,20 +42,20 @@ describe('Umbrella Alert Plugin', () => {
   });
 
   afterEach(done => {
-    process.env.WEATHER_CITY_ID = WEATHER_CITY_ID;
-    process.env.OPEN_WEATHER_MAP_API_KEY = OPEN_WEATHER_MAP_API_KEY;
+    process.env.WEATHER_CITY_COORDS = WEATHER_CITY_COORDS;
+    process.env.DARKSKY_API_KEY = DARKSKY_API_KEY;
     server.stop({}, done);
   });
 
   describe('#GET /plugins/umbrella-alert', () => {
     beforeEach(() => {
-      process.env.WEATHER_CITY_ID = '1234';
-      process.env.OPEN_WEATHER_MAP_API_KEY = 'foobarapikey';
+      process.env.WEATHER_CITY_COORDS = '12,-34';
+      process.env.DARKSKY_API_KEY = 'foobarapikey';
     });
 
     describe('when no city ID has been configured', () => {
       beforeEach(() => {
-        process.env.WEATHER_CITY_ID = '';
+        process.env.WEATHER_CITY_COORDS = '';
       });
 
       it('should respond with a 0 priority message', done => {
@@ -73,7 +73,7 @@ describe('Umbrella Alert Plugin', () => {
 
     describe('when no weather API key has been configured', () => {
       beforeEach(() => {
-        process.env.OPEN_WEATHER_MAP_API_KEY = '';
+        process.env.DARKSKY_API_KEY = '';
       });
 
       it('should respond with a 0 priority message', done => {
@@ -93,7 +93,7 @@ describe('Umbrella Alert Plugin', () => {
       it('should make an API call to the weather service', () => {
         server.inject(query);
         expect(wreck.get.calledWithMatch(
-          'http://api.openweathermap.org/data/2.5/forecast?id=1234&APPID=foobarapikey'
+          'https://api.darksky.net/forecast/foobarapikey/12,-34'
         )).to.be.true;
       });
     });
@@ -114,18 +114,17 @@ describe('Umbrella Alert Plugin', () => {
     describe('when the API call succeeds', () => {
       beforeEach(() => {
         data = {
-          city: {
-            name: 'Toronto',
-            country: 'CA',
+          hourly: {
+            summary: 'Tut tut, it looks like precipitation',
+            data: [],
           },
-          list: [],
         };
         wreck.get.yields(null, null, data);
       });
 
-      it('should respond with the city name', done => {
+      it('should respond with the summary for today', done => {
         server.inject(query).then(response => {
-          expect(response.result.data.city.name).to.equal('Toronto');
+          expect(response.result.data.message).to.equal('Tut tut, it looks like precipitation');
           done();
         });
       });
@@ -134,12 +133,22 @@ describe('Umbrella Alert Plugin', () => {
     describe('when there is a large amount of rain expected in the next three hours', () => {
       beforeEach(() => {
         data = {
-          list: [
-            { rain: { '3h': 30 } },
-            { rain: { '3h': 32 } },
-            { rain: { '3h': 40 } },
-            { rain: { '3h': 30 } },
-          ],
+          hourly: {
+            data: [
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0 },
+            ],
+          },
         };
         wreck.get.yields(null, null, data);
       });
@@ -162,12 +171,22 @@ describe('Umbrella Alert Plugin', () => {
     describe('when there is no rain expected within the next twelve hours', () => {
       beforeEach(() => {
         data = {
-          list: [
-            { rain: { '3h': 0 } },
-            { },
-            { rain: { '3h': 0 } },
-            { rain: { '3h': 0 } },
-          ],
+          hourly: {
+            data: [
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+            ],
+          },
         };
         wreck.get.yields(null, null, data);
       });
@@ -190,12 +209,22 @@ describe('Umbrella Alert Plugin', () => {
     describe('when there is some rain expected in the near future', () => {
       beforeEach(() => {
         data = {
-          list: [
-            { rain: { '3h': 1.7 } },
-            { rain: { '3h': 3 } },
-            { rain: { '3h': 6 } },
-            { rain: { '3h': 0 } },
-          ],
+          hourly: {
+            data: [
+              { precipIntensity: 0.03 },
+              { precipIntensity: 0.005 },
+              { precipIntensity: 0.03 },
+              { precipIntensity: 0.05 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0.05 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0.1 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+            ],
+          },
         };
         wreck.get.yields(null, null, data);
       });
@@ -218,24 +247,44 @@ describe('Umbrella Alert Plugin', () => {
     describe('when some rain is expected soon, then lots of rain later', () => {
       beforeEach(() => {
         data = {
-          list: [
-            { rain: { '3h': 1.7 } },
-            { rain: { '3h': 3 } },
-            { rain: { '3h': 33 } },
-            { rain: { '3h': 40 } },
-          ],
+          hourly: {
+            data: [
+              { precipIntensity: 0.05 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0.05 },
+              { precipIntensity: 0.05 },
+              { precipIntensity: 0.05 },
+              { precipIntensity: 0.05 },
+              { precipIntensity: 0.1 },
+              { precipIntensity: 0.2 },
+              { precipIntensity: 0.3 },
+              { precipIntensity: 0.2 },
+              { precipIntensity: 0.2 },
+              { precipIntensity: 0.2 },
+            ],
+          },
         };
         wreck.get.yields(null, null, data);
       });
 
       it('should respond with a higher priority message than if no rain is expected soon, then lots of rain later', done => { // eslint-disable-line max-len
         const altData = {
-          list: [
-            { rain: { '3h': 0 } },
-            { rain: { '3h': 0 } },
-            { rain: { '3h': 33 } },
-            { rain: { '3h': 40 } },
-          ],
+          hourly: {
+            data: [
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0 },
+              { precipIntensity: 0.1 },
+              { precipIntensity: 0.2 },
+              { precipIntensity: 0.5 },
+              { precipIntensity: 0.2 },
+              { precipIntensity: 0.2 },
+              { precipIntensity: 0.2 },
+            ],
+          },
         };
         wreck.get.yields(null, null, altData);
         server.inject(query).then(altResponse => {
