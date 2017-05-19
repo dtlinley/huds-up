@@ -19,7 +19,10 @@
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
     "hapi": "^13.4.0",
+    "hapi-react": "^5.0.1",
     "node-df": "^0.1.1",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
     "wreck": "^10.0.0"
   },
   "devDependencies": {
