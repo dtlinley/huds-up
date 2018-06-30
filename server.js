@@ -2,6 +2,9 @@ const Hapi = require('hapi');
 const fs = require('fs');
 const wreck = require('wreck');
 const dotenv = require('dotenv');
+const vision = require('vision');
+const inert = require('inert');
+const views = require('./views/index.js');
 
 dotenv.config({ silent: true });
 const plugins = [];
@@ -10,7 +13,7 @@ const server = new Hapi.Server();
 server.connection({ port });
 
 const promise = new Promise((resolve, reject) => {
-  server.start(serverErr => {
+  server.register([vision, inert]).then(() => server.start(serverErr => {
     if (serverErr) {
       reject(serverErr);
     }
@@ -25,6 +28,8 @@ const promise = new Promise((resolve, reject) => {
       server.log(['info'], `Server running at ${server.info.uri}`);
     }
 
+    server.register(views);
+
     fs.readdir('./plugins', (fsErr, files) => {
       if (fsErr) {
         return reject(fsErr);
@@ -37,7 +42,7 @@ const promise = new Promise((resolve, reject) => {
       });
       return resolve(server);
     });
-  });
+  }));
 });
 
 promise.then(srv => {
