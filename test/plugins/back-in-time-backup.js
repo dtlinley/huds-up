@@ -57,7 +57,6 @@ describe('Back In Time Backup Plugin', () => {
     beforeEach(() => {
       const fakeNow = '2016-01-15T14:00:00';
       const date = new Date(fakeNow);
-      date.setHours(date.getHours() + (date.getTimezoneOffset() / 60));
       clock = sinon.useFakeTimers(date.getTime());
     });
 
