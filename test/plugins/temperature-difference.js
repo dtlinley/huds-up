@@ -95,7 +95,7 @@ describe('temperatureDifference Plugin', () => {
 
         describe('and tomorrow\'s temperatures will be further from pleasant', () => {
           beforeEach(() => {
-            data.daily.data.push({ apparentTemperatureMin: 10, apparentTemperatureMax: 20 });
+            data.daily.data.push({ apparentTemperatureMin: 12, apparentTemperatureMax: 22 });
           });
 
           it('should respond with a medium priority message', (done) => {
@@ -122,18 +122,18 @@ describe('temperatureDifference Plugin', () => {
 
       describe('when today was not pleasant', () => {
         beforeEach(() => {
-          data.daily.data.push({ apparentTemperatureMin: 5, apparentTemperatureMax: 15 });
+          data.daily.data.push({ apparentTemperatureMin: 11, apparentTemperatureMax: 16 });
         });
 
         describe('and tomorrow will be less pleasant', () => {
           beforeEach(() => {
-            data.daily.data.push({ apparentTemperatureMin: 0, apparentTemperatureMax: 10 });
+            data.daily.data.push({ apparentTemperatureMin: 8, apparentTemperatureMax: 13 });
           });
 
           it('should respond with a higher priority than if tomorrow is more pleasant', (done) => {
             server.inject(query).then((lessPleasantResponse) => {
               const unpleasantPriority = lessPleasantResponse.result.priority;
-              data.daily.data[1] = { apparentTemperatureMin: 10, apparentTemperatureMax: 20 };
+              data.daily.data[1] = { apparentTemperatureMin: 14, apparentTemperatureMax: 19 };
               server.inject(query).then((morePleasantResponse) => {
                 const pleasantPriority = morePleasantResponse.result.priority;
                 expect(pleasantPriority).to.be.below(unpleasantPriority);
@@ -160,7 +160,7 @@ describe('temperatureDifference Plugin', () => {
           data: [{ apparentTemperatureMin: 15, apparentTemperatureMax: 25 }],
         } });
 
-        data.daily.data.push({ apparentTemperatureMin: 10, apparentTemperatureMax: 20 });
+        data.daily.data.push({ apparentTemperatureMin: 13, apparentTemperatureMax: 22 });
         data.daily.data.push({});
       });
 

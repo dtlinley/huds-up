@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="styles/temperature-difference.css" type="text/css"/>
+
+<section class="temperature-summary">
+  <div class="temperature-difference">
+    {{#unless (isNegative data.averageTemperatureDifference)}}+{{/unless}}{{round data.averageTemperatureDifference}}&deg;C
+  </div>
+
+  <table class="temperature-blocks">
+    <tr class="temperature-block">
+      <td>High</td>
+      <td class="next">{{round data.next.apparentTemperatureMax}}&deg;C</td>
+      <td class="current">{{round data.current.apparentTemperatureMax}}&deg;C</td>
+    </tr>
+
+    <tr class="temperature-block">
+      <td>Low</td>
+      <td class="next">{{round data.next.apparentTemperatureMin}}&deg;C</td>
+      <td class="current">{{round data.current.apparentTemperatureMin}}&deg;C</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <p><strong>{{date data.current.time}}:</strong> {{data.current.summary}}</p>
+</section>
+
+<section>
+  <p><strong>{{date data.next.time}}:</strong> {{data.next.summary}}</p>
+</section>

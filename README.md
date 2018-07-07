@@ -32,6 +32,10 @@ This project uses Dotenv to provide environment variables that are required for 
 
 `npm test`
 
+### Debugging
+
+`npm run debug`
+
 ### Make A New Plugin
 
 `npm run new-plugin -- <plugin name>`

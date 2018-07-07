@@ -11,15 +11,23 @@
     "test": "eslint . && NODE_ENV=test mocha --reporter dot --recursive test",
     "lint": "eslint .",
     "new-plugin": "node generator/add-plugin.js",
-    "debug": "node debug ."
+    "debug": "node debug .",
+    "test-debug": "NODE_ENV=test mocha debug --recursive test"
   },
   "author": "David Linley",
   "license": "ISC",
   "dependencies": {
+    "chart.js": "^2.7.2",
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
+    "handlebars": "^4.0.11",
     "hapi": "^13.4.0",
+    "hapi-react": "^5.0.1",
+    "inert": "^4.2.1",
     "node-df": "^0.1.1",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "vision": "^4.1.0",
     "wreck": "^10.0.0"
   },
   "devDependencies": {

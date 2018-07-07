@@ -1,0 +1,65 @@
+.container {
+  background-color: #eee;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card {
+  background-color: white;
+  border: 0.15em solid;
+  box-shadow: 0.15em 0.15em 0.3em darkgray;
+  flex: 1 1 300px;
+  margin: 10px;
+}
+
+.card.high-priority {
+  border-color: #d43f3a;
+}
+
+.card.medium-priority {
+  border-color: #eea236;
+}
+
+.card.low-priority {
+  border-color: #4cae4c;
+}
+
+.card-header {
+  display: flex;
+  font-family: "DejaVu Sans Mono";
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.card-header.high-priority {
+  background: #d9534f;
+  color: white;
+}
+
+.card-header.medium-priority {
+  background: #f0ad4e;
+  color: white;
+}
+
+.card-header.low-priority {
+  background: #5cb85c;
+  color: white;
+}
+
+.card-body {
+  font-family: "Liberation Sans";
+  padding: 10px;
+}
+
+.chart-container {
+  height: 200px;
+}
+
+h1 {
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}

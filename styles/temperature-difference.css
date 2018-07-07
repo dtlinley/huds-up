@@ -1,0 +1,20 @@
+.temperature-block {
+  vertical-align: baseline;
+}
+
+.temperature-block .current {
+  color: gray;
+}
+
+.temperature-block .next {
+  font-size: 2em;
+}
+
+.temperature-difference {
+  font-size: 3em;
+}
+
+.temperature-summary {
+  display: flex;
+  justify-content: space-around;
+}

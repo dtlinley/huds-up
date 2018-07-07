@@ -2,6 +2,9 @@ const Hapi = require('hapi');
 const fs = require('fs');
 const wreck = require('wreck');
 const dotenv = require('dotenv');
+const vision = require('vision');
+const inert = require('inert');
+const views = require('./views/index.js');
 
 dotenv.config({ silent: true });
 const plugins = [];
@@ -10,14 +13,22 @@ const server = new Hapi.Server();
 server.connection({ port });
 
 const promise = new Promise((resolve, reject) => {
-  server.start(serverErr => {
+  server.register([vision, inert]).then(() => server.start(serverErr => {
     if (serverErr) {
       reject(serverErr);
     }
 
+    server.on('log', (event) => {
+      const date = (new Date(event.timestamp)).toISOString();
+      const tags = JSON.stringify(event.tags);
+      console.log(`${date} - ${tags} ${event.data}`); // eslint-disable-line no-console
+    });
+
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Server running at ${server.info.uri}`); // eslint-disable-line no-console
+      server.log(['info'], `Server running at ${server.info.uri}`);
     }
+
+    server.register(views);
 
     fs.readdir('./plugins', (fsErr, files) => {
       if (fsErr) {
@@ -31,7 +42,7 @@ const promise = new Promise((resolve, reject) => {
       });
       return resolve(server);
     });
-  });
+  }));
 });
 
 promise.then(srv => {
