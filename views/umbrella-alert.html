@@ -1,0 +1,40 @@
+<p>{{data.message}}</p>
+<div class="chart-container">
+  <canvas id="myChart" width="200" height="150"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script>
+var ctx = document.getElementById("myChart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [
+        {{#each data.rain}}
+        "{{toTimeString this.time}}",
+        {{/each}}
+      ],
+      datasets: [
+        {
+          label: 'Rain (mm)',
+          data: [
+            {{#each data.rain}}
+            {{mm}},
+            {{/each}}
+          ],
+          borderColor: '#2e6da4',
+          backgroundColor: '#337ab7',
+        }
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        yAxes: [{
+          ticks: {
+            suggestedMax: 0.025,
+          },
+        }],
+      },
+    },
+});
+</script>
