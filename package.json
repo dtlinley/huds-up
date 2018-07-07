@@ -11,7 +11,8 @@
     "test": "eslint . && NODE_ENV=test mocha --reporter dot --recursive test",
     "lint": "eslint .",
     "new-plugin": "node generator/add-plugin.js",
-    "debug": "node debug ."
+    "debug": "node debug .",
+    "test-debug": "NODE_ENV=test mocha debug --recursive test"
   },
   "author": "David Linley",
   "license": "ISC",
