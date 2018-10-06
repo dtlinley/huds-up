@@ -211,14 +211,14 @@ describe('Umbrella Alert Plugin', () => {
         data = {
           hourly: {
             data: [
-              { precipIntensity: 0.03 },
-              { precipIntensity: 0.005 },
-              { precipIntensity: 0.03 },
-              { precipIntensity: 0.05 },
+              { precipIntensity: 0.006 },
+              { precipIntensity: 0.001 },
+              { precipIntensity: 0.006 },
+              { precipIntensity: 0.01 },
               { precipIntensity: 0 },
-              { precipIntensity: 0.05 },
+              { precipIntensity: 0.01 },
               { precipIntensity: 0 },
-              { precipIntensity: 0.1 },
+              { precipIntensity: 0.02 },
               { precipIntensity: 0 },
               { precipIntensity: 0 },
               { precipIntensity: 0 },
