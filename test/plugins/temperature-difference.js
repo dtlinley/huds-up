@@ -8,7 +8,7 @@ const sinon = require('sinon');
 describe('temperatureDifference Plugin', () => {
   let query;
   let server;
-  let wreck;
+  let cache;
   let clock;
   let forecastStub;
 
@@ -27,20 +27,18 @@ describe('temperatureDifference Plugin', () => {
     server = new Hapi.Server();
     server.connection({});
 
-    wreck = {
+    cache = {
       get: sinon.stub(),
     };
 
     const plugin = proxyquire('../../plugins/temperature-difference', {
-      wreck: {
-        defaults: () => wreck,
-      },
+      '../cache.js': cache,
     });
 
     server.register(plugin);
 
     today = new Date();
-    forecastStub = wreck.get.withArgs('https://api.darksky.net/forecast/foobarapikey/12,-34?units=ca', sinon.match.func);
+    forecastStub = cache.get.withArgs('https://api.darksky.net/forecast/foobarapikey/12,-34?units=ca');
   });
 
   afterEach(() => {
@@ -57,7 +55,8 @@ describe('temperatureDifference Plugin', () => {
           data: [],
         },
       };
-      forecastStub.yields(null, { statusCode: 200 }, data);
+      cache.get.returns(Promise.resolve(data));
+      forecastStub.returns(Promise.resolve(data));
     });
 
     it('should get the weather forecast', () => {
@@ -155,10 +154,10 @@ describe('temperatureDifference Plugin', () => {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayTime = Math.floor(yesterday.getTime() / 1000);
-        priorStub = wreck.get.withArgs(`https://api.darksky.net/forecast/foobarapikey/12,-34,${yesterdayTime}?units=ca`, sinon.match.func);
-        priorStub.yields(null, { statusCode: 200 }, { daily: {
+        priorStub = cache.get.withArgs(`https://api.darksky.net/forecast/foobarapikey/12,-34,${yesterdayTime}?units=ca`);
+        priorStub.returns(Promise.resolve({ daily: {
           data: [{ apparentTemperatureMin: 15, apparentTemperatureMax: 25 }],
-        } });
+        } }));
 
         data.daily.data.push({ apparentTemperatureMin: 13, apparentTemperatureMax: 22 });
         data.daily.data.push({});
