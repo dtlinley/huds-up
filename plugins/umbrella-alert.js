@@ -1,6 +1,7 @@
 'use strict';
 
-const wreck = require('wreck').defaults({ json: true });
+// const wreck = require('wreck').defaults({ json: true });
+const cache = require('../cache.js');
 
 // the number of forecasts to consider; users generally don't care about whether an umbrella is
 // needed more than 12 hours in the future
@@ -24,18 +25,7 @@ exports.register = (server, options, next) => {
 
       const apiBase = 'https://api.darksky.net/forecast';
       const url = `${apiBase}/${apiKey}/${cityLatLong}`;
-      return wreck.get(url, (err, res, payload) => {
-        if (err) {
-          return reply({
-            priority: 60,
-            type: 'umbrella-alert',
-            data: {
-              error: err,
-              message: 'Could not fetch data',
-            },
-          });
-        }
-
+      return cache.get(url).then((payload) => {
         const response = {
           priority: 0,
           type: 'umbrella-alert',
@@ -70,6 +60,15 @@ exports.register = (server, options, next) => {
           response.priority = priority;
         }
         return reply(response);
+      }).catch((err) => {
+        reply({
+          priority: 60,
+          type: 'umbrella-alert',
+          data: {
+            error: err,
+            message: 'Could not fetch data',
+          },
+        });
       });
     },
   });

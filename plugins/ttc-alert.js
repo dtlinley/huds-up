@@ -1,7 +1,7 @@
 'use strict';
 
-const wreck = require('wreck');
 const cheerio = require('cheerio');
+const cache = require('../cache.js');
 
 const ALERT_URL = 'http://www.ttc.ca/Service_Advisories/all_service_alerts.jsp';
 const ELEVATOR_BROKEN = 'Elevator out of service';
@@ -12,11 +12,7 @@ exports.register = (server, options, next) => {
     method: 'GET',
     path: '/plugins/ttc-alert',
     handler: (request, reply) => {
-      wreck.get(ALERT_URL, (err, response, payload) => {
-        if (err) {
-          return reply({ priority: 80, type: 'ttc-alert', data: { error: err } });
-        }
-
+      cache.get(ALERT_URL).then((payload) => {
         const dom = cheerio.load(payload.toString());
         const alerts = [];
         dom('.alert-content p.veh-replace').map((i, elem) => dom(elem).text())
@@ -43,6 +39,8 @@ exports.register = (server, options, next) => {
         const data = { priority, type: 'ttc-alert', data: { alerts: filtered } };
 
         return reply(data);
+      }).catch((err) => {
+        reply({ priority: 80, type: 'ttc-alert', data: { error: err } });
       });
     },
   });

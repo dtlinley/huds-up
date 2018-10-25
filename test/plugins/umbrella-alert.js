@@ -10,7 +10,7 @@ describe('Umbrella Alert Plugin', () => {
   let DARKSKY_API_KEY;
   let query;
   let server;
-  let wreck;
+  let cache;
   let data;
 
   beforeEach(done => {
@@ -26,13 +26,11 @@ describe('Umbrella Alert Plugin', () => {
         throw err;
       }
 
-      wreck = {
+      cache = {
         get: sinon.stub(),
       };
       const plugin = proxyquire('../../plugins/umbrella-alert', {
-        wreck: {
-          defaults: () => wreck,
-        },
+        '../cache.js': cache,
       });
 
       server.register(plugin);
@@ -67,7 +65,7 @@ describe('Umbrella Alert Plugin', () => {
 
       it('should not attempt to fetch weather data', () => {
         server.inject(query);
-        expect(wreck.get.called).to.be.false;
+        expect(cache.get.called).to.be.false;
       });
     });
 
@@ -85,14 +83,14 @@ describe('Umbrella Alert Plugin', () => {
 
       it('should not attempt to fetch weather data', () => {
         server.inject(query);
-        expect(wreck.get.called).to.be.false;
+        expect(cache.get.called).to.be.false;
       });
     });
 
     describe('fetching rain data', () => {
       it('should make an API call to the weather service', () => {
         server.inject(query);
-        expect(wreck.get.calledWithMatch(
+        expect(cache.get.calledWithMatch(
           'https://api.darksky.net/forecast/foobarapikey/12,-34'
         )).to.be.true;
       });
@@ -100,7 +98,7 @@ describe('Umbrella Alert Plugin', () => {
 
     describe('when the API call fails', () => {
       beforeEach(() => {
-        wreck.get.yields('Uh oh, something went wrong');
+        cache.get.returns(Promise.reject('Uh oh, something went wrong'));
       });
 
       it('should respond with a high priority message', done => {
@@ -119,7 +117,7 @@ describe('Umbrella Alert Plugin', () => {
             data: [],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with the summary for today', done => {
@@ -150,7 +148,7 @@ describe('Umbrella Alert Plugin', () => {
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a high priority message', done => {
@@ -188,7 +186,7 @@ describe('Umbrella Alert Plugin', () => {
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a low priority message', done => {
@@ -226,7 +224,7 @@ describe('Umbrella Alert Plugin', () => {
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a higher priority message than if rain isn\'t expected', done => {
@@ -264,7 +262,7 @@ describe('Umbrella Alert Plugin', () => {
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a higher priority message than if no rain is expected soon, then lots of rain later', done => { // eslint-disable-line max-len
@@ -286,9 +284,9 @@ describe('Umbrella Alert Plugin', () => {
             ],
           },
         };
-        wreck.get.yields(null, null, altData);
+        cache.get.returns(Promise.resolve(altData));
         server.inject(query).then(altResponse => {
-          wreck.get.yields(null, null, data);
+          cache.get.returns(Promise.resolve(data));
           server.inject(query).then(response => {
             expect(response.result.priority).to.be.above(altResponse.result.priority);
             done();
