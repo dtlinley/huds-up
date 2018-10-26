@@ -89,6 +89,7 @@ describe('Umbrella Alert Plugin', () => {
 
     describe('fetching rain data', () => {
       it('should make an API call to the weather service', () => {
+        cache.get.returns(Promise.reject('foobar'));
         server.inject(query);
         expect(cache.get.calledWithMatch(
           'https://api.darksky.net/forecast/foobarapikey/12,-34'

@@ -71,6 +71,12 @@ exports.register = (server, options, next) => {
 
         response.data.current = current;
         response.data.next = upcoming;
+
+        if (!current || !upcoming) {
+          response.data.message = 'Missing data for forecasts';
+          return reply(response);
+        }
+
         const minTempDiff =
           upcoming.apparentTemperatureMin - current.apparentTemperatureMin;
         const maxTempDiff =
