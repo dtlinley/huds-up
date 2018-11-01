@@ -62,11 +62,13 @@ promise.then(srv => {
         }));
       });
       Promise.all(promises).then(
-        responses => reply(
-          responses
-          .filter(response => response.priority > 0)
-          .sort((a, b) => b.priority - a.priority)
-        ),
+        responses => {
+          reply(
+            responses
+            .filter(response => response.priority > 0)
+            .sort((a, b) => b.priority - a.priority)
+          )
+        },
         error => reply(`Error encountered while loading plugins:
           ${error.statusCode} ${error.statusMessage} ${error.req.path}`)
       );
