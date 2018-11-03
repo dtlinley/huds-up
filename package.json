@@ -40,6 +40,6 @@
     "eslint-plugin-react": "^5.1.1",
     "mocha": "^2.4.5",
     "proxyquire": "^1.7.9",
-    "sinon": "^1.17.4"
+    "sinon": "^7.1.1"
   }
 }
