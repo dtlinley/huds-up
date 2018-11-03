@@ -63,7 +63,7 @@ describe('nagbot Plugin', () => {
           { id: 2, name: 'Wash towels', interval: '1 weeks', next: '2018-01-08T00:00:00Z' },
         ]));
 
-        fakeDate = new Date('2018-01-07T00:00:00Z');
+        fakeDate = new Date('2018-01-07T18:00:00Z');
         clock = sinon.useFakeTimers(fakeDate.getTime());
       });
 
@@ -82,8 +82,8 @@ describe('nagbot Plugin', () => {
       it('should have a high priority for nags that are almost due', done => {
         server.inject(query).then(response => {
           expect(
-            response.result.find(nag => nag.name === 'Wash towels').priority
-          ).to.be.greaterThan(70);
+            response.result.find(nag => nag.data.id === 2).priority
+          ).to.be.greaterThan(50);
           done();
         });
       });
@@ -91,14 +91,41 @@ describe('nagbot Plugin', () => {
       it('should have a low priority for nags that aren\'t due soon', done => {
         server.inject(query).then(response => {
           expect(
-            response.result.find(nag => nag.name === 'Water the plants').priority
+            response.result.find(nag => nag.data.id === 1).priority
           ).to.be.lessThan(20);
           done();
         });
       });
 
+      it('should respond with the days until each nag is due', done => {
+        server.inject(query).then(response => {
+          expect(
+            response.result.find(nag => nag.data.id === 1).data.daysToNext
+          ).to.equal(7.25);
+          done();
+        });
+      });
+
+      it('should respond with the name of each nag', done => {
+        server.inject(query).then(response => {
+          expect(
+            response.result.find(nag => nag.data.id === 1).data.name
+          ).to.equal('Water the plants');
+          done();
+        });
+      });
+
       describe('when the database call fails', () => {
-        it('should respond with an error');
+        beforeEach(() => {
+          db.getNags.returns(Promise.reject('test database error'));
+        });
+
+        it('should respond with an error', done => {
+          server.inject(query).then(response => {
+            expect(response.result.data.message).to.equal('Could not fetch nags');
+            done();
+          });
+        });
       });
     });
   });

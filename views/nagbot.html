@@ -1,24 +1,24 @@
 <section class="primary">
-  <strong>{{name}}</strong>
+  <strong>{{data.name}}</strong>
 </section>
 
 <section class="detail">
   <p>
-    {{#if (isNegative daysToNext)}}
+    {{#if (isNegative data.daysToNext)}}
       Overdue
     {{else}}
-      {{#if (lessThan daysToNext 1)}}
+      {{#if (lessThan data.daysToNext 1)}}
         Due today
       {{else}}
-        Due in {{daysToNext}} days
+        Due in {{round data.daysToNext}} days
       {{/if}}
     {{/if}}
   </p>
   <p>
-    Every {{interval.days}} days
+    Every {{data.interval.days}} days
   </p>
 </section>
 
-<form action="/plugins/nagbot/formapi/{{id}}" method="post">
+<form action="/plugins/nagbot/formapi/{{data.id}}" method="post">
   <button type="submit" name="button">Mark as done</button>
 </form>

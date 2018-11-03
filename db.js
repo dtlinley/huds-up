@@ -15,6 +15,6 @@ module.exports = {
   getNags: () => clientPromise.then(
     client => client.query('SELECT * FROM nags').then(
       result => result.rows
-    )
+    ).catch(exception => Promise.reject(exception.message))
   ),
 };

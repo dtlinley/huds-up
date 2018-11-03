@@ -18,5 +18,8 @@
       </div>
     </section>
     {{/each}}
+    {{#unless plugins}}
+      There was an error loading plugins. Please try again later.
+    {{/unless}}
   </body>
 </html>

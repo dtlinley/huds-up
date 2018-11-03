@@ -4,7 +4,7 @@ const expect = require('chai').expect;
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 
-describe.only('Database', () => {
+describe('Database', () => {
   let pgClient;
   let db;
 
@@ -51,7 +51,17 @@ describe.only('Database', () => {
     });
 
     describe('when the database connection fails', () => {
-      it('should reject with the error');
+      beforeEach(() => {
+        pgClient.query.withArgs('SELECT * FROM nags')
+          .rejects(Error('test database error'));
+      });
+
+      it('should reject with the error', done => {
+        db.getNags().catch(error => {
+          expect(error).to.equal('test database error');
+          done();
+        });
+      });
     });
   });
 });

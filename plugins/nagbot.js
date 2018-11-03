@@ -4,7 +4,7 @@ const db = require('../db.js');
 
 const MS_IN_DAY = 86400000;
 const MAX_PRIORITY = 85;
-const DAMPENING_FACTOR = 1.34;
+const DAMPENING_FACTOR = 1.3;
 
 exports.register = (server, options, next) => {
   server.route({
@@ -15,10 +15,6 @@ exports.register = (server, options, next) => {
         if (!nags || !nags.length) {
           return reply({ priority: 0, type: 'nagbot', message: 'No nags found' });
         }
-
-        const getPriority = nag => {
-
-        };
 
         return reply(nags.map(nag => {
           const nextOccurence = new Date(nag.next);
@@ -32,15 +28,27 @@ exports.register = (server, options, next) => {
           const priority = MAX_PRIORITY / (DAMPENING_FACTOR * adjustedDays);
 
           return {
-            daysToNext,
-            id: nag.id,
-            interval: nag.interval,
-            name: nag.name,
-            next: nag.next,
             priority,
             type: 'nagbot',
+            data: {
+              daysToNext,
+              id: nag.id,
+              interval: nag.interval,
+              name: nag.name,
+              next: nag.next,
+            },
           };
         }));
+      }, error => {
+        server.log(['error'], error.stack);
+        reply({
+          priority: 60,
+          type: 'nagbot',
+          data: {
+            error,
+            message: 'Could not fetch nags',
+          },
+        });
       });
     },
   });
