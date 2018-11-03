@@ -65,9 +65,10 @@ promise.then(srv => {
         responses => {
           reply(
             responses
+            .reduce((acc, val) => acc.concat(val), [])
             .filter(response => response.priority > 0)
             .sort((a, b) => b.priority - a.priority)
-          )
+          );
         },
         error => reply(`Error encountered while loading plugins:
           ${error.statusCode} ${error.statusMessage} ${error.req.path}`)

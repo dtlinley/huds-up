@@ -5,7 +5,7 @@ const Hapi = require('hapi');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
-describe.only('nagbot Plugin', () => {
+describe('nagbot Plugin', () => {
   let query;
   let server;
   let db;
@@ -95,6 +95,10 @@ describe.only('nagbot Plugin', () => {
           ).to.be.lessThan(20);
           done();
         });
+      });
+
+      describe('when the database call fails', () => {
+        it('should respond with an error');
       });
     });
   });

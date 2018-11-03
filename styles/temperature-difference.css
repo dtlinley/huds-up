@@ -18,3 +18,9 @@
   display: flex;
   justify-content: space-around;
 }
+
+.temperature-summary .detail {
+  color: gray;
+  font-size: 0.75em;
+  vertical-align: middle;
+}

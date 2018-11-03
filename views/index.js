@@ -1,6 +1,5 @@
 const fs = require('fs');
 const handlebars = require('handlebars');
-// const Chart = require('chart.js');
 
 exports.register = (server, options, next) => {
   server.views({
@@ -20,6 +19,7 @@ exports.register = (server, options, next) => {
   registerPartial('backup-backintime');
   registerPartial('temperature-difference');
   registerPartial('umbrella-alert');
+  registerPartial('nagbot');
 
   handlebars.registerHelper('percent', (number) => number * 100);
   handlebars.registerHelper('toTimeString', (time) => {
@@ -38,6 +38,7 @@ exports.register = (server, options, next) => {
     if (priority >= 50) return 'medium-priority';
     return 'low-priority';
   });
+  handlebars.registerHelper('lessThan', (number, comparedTo) => number < comparedTo);
 
   server.route({
     method: 'GET',

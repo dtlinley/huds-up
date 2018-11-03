@@ -1,0 +1,24 @@
+<section class="primary">
+  <strong>{{name}}</strong>
+</section>
+
+<section class="detail">
+  <p>
+    {{#if (isNegative daysToNext)}}
+      Overdue
+    {{else}}
+      {{#if (lessThan daysToNext 1)}}
+        Due today
+      {{else}}
+        Due in {{daysToNext}} days
+      {{/if}}
+    {{/if}}
+  </p>
+  <p>
+    Every {{interval.days}} days
+  </p>
+</section>
+
+<form action="/plugins/nagbot/formapi/{{id}}" method="post">
+  <button type="submit" name="button">Mark as done</button>
+</form>

@@ -4,7 +4,7 @@ const db = require('../db.js');
 
 const MS_IN_DAY = 86400000;
 const MAX_PRIORITY = 85;
-const MIN_PRIORITY = 0;
+const DAMPENING_FACTOR = 1.34;
 
 exports.register = (server, options, next) => {
   server.route({
@@ -17,19 +17,30 @@ exports.register = (server, options, next) => {
         }
 
         const getPriority = nag => {
+
+        };
+
+        return reply(nags.map(nag => {
           const nextOccurence = new Date(nag.next);
           const now = new Date();
 
-          const daysToNext = Math.floor((nextOccurence - now) / MS_IN_DAY);
-          return Math.max(MIN_PRIORITY, MAX_PRIORITY - Math.exp(daysToNext));
-        };
+          const daysToNext = (nextOccurence - now) / MS_IN_DAY;
+          const adjustedDays = Math.max(
+            (1 / DAMPENING_FACTOR),
+            daysToNext + 1
+          );
+          const priority = MAX_PRIORITY / (DAMPENING_FACTOR * adjustedDays);
 
-        return reply(nags.map(nag => ({
-          priority: getPriority(nag),
-          name: nag.name,
-          next: nag.next,
-          interval: nag.interval,
-        })));
+          return {
+            daysToNext,
+            id: nag.id,
+            interval: nag.interval,
+            name: nag.name,
+            next: nag.next,
+            priority,
+            type: 'nagbot',
+          };
+        }));
       });
     },
   });

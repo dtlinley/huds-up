@@ -2,7 +2,9 @@
 
 <section class="temperature-summary">
   <div class="temperature-difference">
-    {{#unless (isNegative data.averageTemperatureDifference)}}+{{/unless}}{{round data.averageTemperatureDifference}}&deg;C
+    <span class="detail">&Delta;</span>
+    {{#unless (isNegative data.averageTemperatureDifference)}}+{{/unless}}
+    {{round data.averageTemperatureDifference}}&deg;C
   </div>
 
   <table class="temperature-blocks">
