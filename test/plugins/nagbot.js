@@ -11,8 +11,6 @@ describe('nagbot Plugin', () => {
   let db;
 
   beforeEach(done => {
-    query = '/plugins/nagbot';
-
     server = new Hapi.Server();
     server.connection({});
 
@@ -23,6 +21,7 @@ describe('nagbot Plugin', () => {
 
       db = {
         getNags: sinon.stub(),
+        updateNagNext: sinon.stub(),
       };
 
       const plugin = proxyquire('../../plugins/nagbot', {
@@ -42,6 +41,7 @@ describe('nagbot Plugin', () => {
   describe('#GET /plugins/nagbot', () => {
     describe('with no nags set up', () => {
       beforeEach(() => {
+        query = '/plugins/nagbot';
         db.getNags.returns(Promise.resolve([]));
       });
 
@@ -127,6 +127,60 @@ describe('nagbot Plugin', () => {
           });
         });
       });
+    });
+  });
+
+  describe('#POST /plugins/nagbot/formapi/nags/<id>', () => {
+    beforeEach(() => {
+      query = {
+        method: 'POST',
+        url: '/plugins/nagbot/formapi/nags/1',
+        payload: {
+          next: '2018-01-22T23:59:59Z',
+        },
+      };
+      db.updateNagNext.returns(Promise.resolve());
+    });
+
+    it('should update the `next` value of the given nag', done => {
+      server.inject(query).then(() => {
+        expect(db.updateNagNext.calledWith(1, '2018-01-22T23:59:59Z')).to.be.true;
+        done();
+      });
+    });
+
+    it('should render a page indicating that the nag has been updated');
+
+    describe('when the database fails', () => {
+      it('should render an error page');
+    });
+  });
+
+  describe('#POST /plugins/nagbot/formapi/nags', () => {
+    it('should create a new nag');
+
+    it('should render a page indicating that the nag has been created');
+
+    describe('when the database fails', () => {
+      it('should render an error page');
+    });
+  });
+
+  describe('#PUT /plugins/nagbot/nags/<id>', () => {
+    it('should allow the nag to be updated');
+
+    describe('when the database call fails', () => {
+      it('should respond with an error message');
+    });
+  });
+
+  describe('#POST /plugins/nagbot/nags', () => {
+    it('should create a new nag');
+
+    it('should respond with the new nag');
+
+    describe('when the database call fails', () => {
+      it('should respond with an error message');
     });
   });
 });
