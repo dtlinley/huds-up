@@ -53,6 +53,17 @@ exports.register = (server, options, next) => {
     },
   });
 
+  // API for handling calls from plain HTML forms.
+  // Updates a single nag with the provided parameters.
+  server.route({
+    method: 'POST',
+    path: '/plugins/nagbot/formapi/nags/{id}',
+    handler: (request, reply) => {
+      db.updateNag(parseInt(request.params.id, 10), request.payload);
+      reply.view('nagbot/formapi-update');
+    },
+  });
+
   next();
 };
 

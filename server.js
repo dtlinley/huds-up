@@ -75,6 +75,12 @@ promise.then(srv => {
       );
     },
   });
+
+  srv.on('request-internal', (request) => {
+    if (process.env.NODE_ENV !== 'test') {
+      srv.log(['info'], `#${request.method} ${request.path}`);
+    }
+  });
 });
 
 promise.catch(error => {

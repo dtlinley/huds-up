@@ -1,9 +1,11 @@
 'use strict';
 
 const expect = require('chai').expect;
+const handlebars = require('handlebars');
 const Hapi = require('hapi');
-const proxyquire = require('proxyquire');
+const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
+const vision = require('vision');
 
 describe('nagbot Plugin', () => {
   let query;
@@ -21,16 +23,21 @@ describe('nagbot Plugin', () => {
 
       db = {
         getNags: sinon.stub(),
-        updateNagNext: sinon.stub(),
+        updateNag: sinon.stub(),
       };
 
       const plugin = proxyquire('../../plugins/nagbot', {
         '../db.js': db,
       });
 
-      server.register(plugin);
+      server.register([plugin, vision]).then(() => {
+        server.views({
+          engines: { html: handlebars },
+          path: `${__dirname}/../../views`,
+        });
 
-      done();
+        done();
+      });
     });
   });
 
@@ -139,17 +146,23 @@ describe('nagbot Plugin', () => {
           next: '2018-01-22T23:59:59Z',
         },
       };
-      db.updateNagNext.returns(Promise.resolve());
+      db.updateNag.returns(Promise.resolve());
     });
 
     it('should update the `next` value of the given nag', done => {
       server.inject(query).then(() => {
-        expect(db.updateNagNext.calledWith(1, '2018-01-22T23:59:59Z')).to.be.true;
+        expect(db.updateNag.calledWith(1, { next: '2018-01-22T23:59:59Z' })).to.be.ok;
         done();
       });
     });
 
-    it('should render a page indicating that the nag has been updated');
+    it('should render a page indicating that the nag has been updated', done => {
+      server.inject(query).then(response => {
+        expect(response.result).to.have.string('<body');
+        expect(response.result).to.have.string('Nag updated');
+        done();
+      });
+    });
 
     describe('when the database fails', () => {
       it('should render an error page');

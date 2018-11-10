@@ -64,4 +64,51 @@ describe('Database', () => {
       });
     });
   });
+
+  describe('#updateNag', () => {
+    let updatePayload;
+
+    beforeEach(() => {
+      updatePayload = { next: '2018-01-01T00:00:00Z' };
+    });
+
+    it('should update the nag with the given ID', done => {
+      db.updateNag(123, updatePayload).then(() => {
+        expect(pgClient.query.calledWithMatch('WHERE id = $1', [123, '2018-01-01T00:00:00Z']))
+          .to.be.ok;
+        done();
+      });
+    });
+
+    describe('with only one property being updated', () => {
+      it('should update only that property of the nag', done => {
+        db.updateNag(123, updatePayload).then(() => {
+          expect(pgClient.query.calledWithMatch(
+            'UPDATE nags SET next = $2',
+            [123, '2018-01-01T00:00:00Z']
+          )).to.be.ok;
+          done();
+        });
+      });
+    });
+
+    describe('with multiple properties updated', () => {
+      beforeEach(() => {
+        updatePayload = {
+          name: 'foobar',
+          next: '2018-01-01T00:00:00Z',
+        };
+      });
+
+      it('should update all properties of the given nag', done => {
+        db.updateNag(123, updatePayload).then(() => {
+          expect(pgClient.query.calledWithMatch(
+            'UPDATE nags SET name = $2,next = $3',
+            [123, 'foobar', '2018-01-01T00:00:00Z']
+          )).to.be.ok;
+          done();
+        });
+      });
+    });
+  });
 });

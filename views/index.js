@@ -40,6 +40,18 @@ exports.register = (server, options, next) => {
   });
   handlebars.registerHelper('lessThan', (number, comparedTo) => number < comparedTo);
 
+  // Nagbot
+  handlebars.registerHelper('updateNext', (date, interval) => {
+    const dateCopy = new Date(date);
+    if (interval.days) {
+      return (new Date(dateCopy.setDate(dateCopy.getDate() + interval.days))).toISOString();
+    } else if (interval.months) {
+      return (new Date(dateCopy.setMonth(dateCopy.getMonth() + interval.days))).toISOString();
+    }
+
+    return dateCopy.toISOString();
+  });
+
   server.route({
     method: 'GET',
     path: '/',

@@ -15,10 +15,17 @@
     {{/if}}
   </p>
   <p>
-    Every {{data.interval.days}} days
+    {{#if data.interval.days}}
+      Every {{data.interval.days}} days
+    {{else}}
+      {{#if data.interval.months}}
+        Every {{data.interval.months}} months
+      {{/if}}
+    {{/if}}
   </p>
 </section>
 
-<form action="/plugins/nagbot/formapi/{{data.id}}" method="post">
+<form action="/plugins/nagbot/formapi/nags/{{data.id}}" method="post">
+  <input type="hidden" name="next" value="{{updateNext data.next data.interval}}">
   <button type="submit" name="button">Mark as done</button>
 </form>
