@@ -24,6 +24,7 @@ describe('nagbot Plugin', () => {
       db = {
         getNags: sinon.stub(),
         updateNag: sinon.stub(),
+        createNag: sinon.stub(),
       };
 
       const plugin = proxyquire('../../plugins/nagbot', {
@@ -35,6 +36,8 @@ describe('nagbot Plugin', () => {
           engines: { html: handlebars },
           path: `${__dirname}/../../views`,
         });
+
+        handlebars.registerHelper('formatDate', () => {});
 
         done();
       });
@@ -165,17 +168,68 @@ describe('nagbot Plugin', () => {
     });
 
     describe('when the database fails', () => {
-      it('should render an error page');
+      beforeEach(() => {
+        db.updateNag.rejects('database error');
+      });
+
+      it('should render an error page', done => {
+        server.inject(query).then((response) => {
+          expect(response.result).to.have.string('<body');
+          expect(response.result).to.have.string('could not be updated');
+          expect(response.result).to.have.string('database error');
+          done();
+        });
+      });
     });
   });
 
   describe('#POST /plugins/nagbot/formapi/nags', () => {
-    it('should create a new nag');
+    beforeEach(() => {
+      query = {
+        method: 'POST',
+        url: '/plugins/nagbot/formapi/nags',
+        payload: {
+          name: 'Task name',
+          intervalCount: '2',
+          intervalLength: 'weeks',
+          next: '2018-01-22T23:59:59Z',
+        },
+      };
+      db.createNag.resolves();
+    });
 
-    it('should render a page indicating that the nag has been created');
+    it('should create a new nag', (done) => {
+      server.inject(query).then(() => {
+        expect(db.createNag.calledWith({
+          name: 'Task name',
+          interval: '2 weeks',
+          next: '2018-01-22T23:59:59Z',
+        })).to.be.true;
+        done();
+      });
+    });
+
+    it('should render a page showing that the nag has been created', done => {
+      server.inject(query).then((response) => {
+        expect(response.result).to.have.string('<body');
+        expect(response.result).to.have.string('Nag created');
+        expect(response.result).to.have.string('Task name');
+        done();
+      });
+    });
 
     describe('when the database fails', () => {
-      it('should render an error page');
+      beforeEach(() => {
+        db.createNag.rejects('test database error');
+      });
+
+      it('should render an error page', done => {
+        server.inject(query).then((response) => {
+          expect(response.result).to.have.string('<body');
+          expect(response.result).to.have.string('test database error');
+          done();
+        });
+      });
     });
   });
 

@@ -26,6 +26,6 @@
 </section>
 
 <form action="/plugins/nagbot/formapi/nags/{{data.id}}" method="post">
-  <input type="hidden" name="next" value="{{updateNext data.next data.interval}}">
-  <button type="submit" name="button">Mark as done</button>
+  <input type="hidden" name="next" value="{{todayPlusInterval data.interval}}">
+  <button type="submit">Mark as done</button>
 </form>

@@ -1,10 +1,11 @@
-const Hapi = require('hapi');
-const fs = require('fs');
-const wreck = require('wreck');
 const dotenv = require('dotenv');
-const vision = require('vision');
+const fs = require('fs');
 const inert = require('inert');
+const handlebars = require('handlebars');
+const Hapi = require('hapi');
 const views = require('./views/index.js');
+const vision = require('vision');
+const wreck = require('wreck');
 
 dotenv.config({ silent: true });
 const plugins = [];
@@ -17,6 +18,11 @@ const promise = new Promise((resolve, reject) => {
     if (serverErr) {
       reject(serverErr);
     }
+
+    server.views({
+      engines: { html: handlebars },
+      path: `${__dirname}/views`,
+    });
 
     server.on('log', (event) => {
       const date = (new Date(event.timestamp)).toISOString();

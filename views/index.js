@@ -2,11 +2,6 @@ const fs = require('fs');
 const handlebars = require('handlebars');
 
 exports.register = (server, options, next) => {
-  server.views({
-    engines: { html: handlebars },
-    path: __dirname,
-  });
-
   const registerPartial = (partial) => {
     handlebars.registerPartial(
       partial,
@@ -26,10 +21,11 @@ exports.register = (server, options, next) => {
     const date = new Date(time * 1000);
     return date.toLocaleTimeString();
   });
-  handlebars.registerHelper('date', (time) => {
+  handlebars.registerHelper('dateFromTime', (time) => {
     const date = new Date(time * 1000);
     return date.toDateString();
   });
+  handlebars.registerHelper('formatDate', (date) => date.toDateString());
   handlebars.registerHelper('round', (number) => Math.round(number));
   handlebars.registerHelper('isPositive', (number) => number > 0);
   handlebars.registerHelper('isNegative', (number) => number < 0);
@@ -41,15 +37,15 @@ exports.register = (server, options, next) => {
   handlebars.registerHelper('lessThan', (number, comparedTo) => number < comparedTo);
 
   // Nagbot
-  handlebars.registerHelper('updateNext', (date, interval) => {
-    const dateCopy = new Date(date);
+  handlebars.registerHelper('todayPlusInterval', (interval) => {
+    const date = new Date((new Date()).setHours(24, 0, 0, 0));
     if (interval.days) {
-      return (new Date(dateCopy.setDate(dateCopy.getDate() + interval.days))).toISOString();
+      return (new Date(date.setDate(date.getDate() + interval.days))).toISOString();
     } else if (interval.months) {
-      return (new Date(dateCopy.setMonth(dateCopy.getMonth() + interval.days))).toISOString();
+      return (new Date(date.setMonth(date.getMonth() + interval.months))).toISOString();
     }
 
-    return dateCopy.toISOString();
+    return date.toISOString();
   });
 
   server.route({

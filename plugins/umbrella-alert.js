@@ -31,6 +31,7 @@ exports.register = (server, options, next) => {
           type: 'umbrella-alert',
           data: { message: payload.hourly.summary },
         };
+        debugger;
         const rain = payload.hourly.data
         .map(forecast => {
           let mm = 0;

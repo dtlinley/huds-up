@@ -110,5 +110,35 @@ describe('Database', () => {
         });
       });
     });
+
+    describe('when the database fails', () => {
+      it('should return a rejected promise');
+    });
+  });
+
+  describe('#createNag', () => {
+    it('should add a nag to the database');
+
+    it('should respond with the new nag');
+
+    describe('when the database fails', () => {
+      it('should return a rejected promise');
+    });
+  });
+
+  describe('#deleteNag', () => {
+    it('should delete the nag from the database');
+
+    describe('when the database call fails', () => {
+      it('should return a rejected promise');
+    });
+  });
+
+  describe('#getNag', () => {
+    it('should respond with the single nag');
+
+    describe('when the database call fails', () => {
+      it('should return a rejected promise');
+    });
   });
 });

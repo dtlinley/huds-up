@@ -59,8 +59,30 @@ exports.register = (server, options, next) => {
     method: 'POST',
     path: '/plugins/nagbot/formapi/nags/{id}',
     handler: (request, reply) => {
-      db.updateNag(parseInt(request.params.id, 10), request.payload);
-      reply.view('nagbot/formapi-update');
+      db.updateNag(parseInt(request.params.id, 10), request.payload)
+      .then(() => {
+        reply.view('nagbot/formapi-update');
+      }, (error) => {
+        reply.view('nagbot/formapi-error', { operationType: 'updated', error });
+      });
+    },
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/plugins/nagbot/formapi/nags',
+    handler: (request, reply) => {
+      const nag = {
+        name: request.payload.name,
+        next: request.payload.next,
+        interval:
+          `${request.payload.intervalCount} ${request.payload.intervalLength}`,
+      };
+      db.createNag(nag).then(() => {
+        reply.view('nagbot/formapi-create', { nag });
+      }, error => {
+        reply.view('nagbot/formapi-error', { operationType: 'created', error });
+      });
     },
   });
 

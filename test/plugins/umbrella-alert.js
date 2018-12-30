@@ -295,5 +295,11 @@ describe('Umbrella Alert Plugin', () => {
         });
       });
     });
+
+    describe('when there is snow expected in the future', () => {
+      it('should return snow data');
+
+      it('should return a low priority');
+    });
   });
 });
