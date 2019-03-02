@@ -31,16 +31,15 @@ exports.register = (server, options, next) => {
           type: 'umbrella-alert',
           data: { message: payload.hourly.summary },
         };
-        debugger;
-        const rain = payload.hourly.data
-        .map(forecast => {
+        const precipData = (type) => payload.hourly.data.map(forecast => {
           let mm = 0;
-          if (forecast.precipIntensity) {
+          if (forecast.precipType === type && forecast.precipIntensity) {
             mm = forecast.precipIntensity;
           }
           return { mm, time: forecast.time };
         });
-        response.data.rain = rain;
+        response.data.rain = precipData('rain');
+        response.data.snow = precipData('snow');
 
         const importance = (data, max, depression) => {
           if (data.length <= 0 || max <= 0) {
@@ -54,7 +53,7 @@ exports.register = (server, options, next) => {
           return current + importance(data.slice(1), nextMax, nextDepression);
         };
 
-        const priority = importance(rain, INITIAL_IMPORTANCE, 1);
+        const priority = importance(response.data.rain, INITIAL_IMPORTANCE, 1);
         if (priority < 2) {
           response.priority = 2;
         } else {
