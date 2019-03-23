@@ -63,6 +63,14 @@ exports.register = (server, options, next) => {
 
   server.route({
     method: 'GET',
+    path: '/nag/new',
+    handler: (request, reply) => {
+      reply.view('nagbot/new');
+    },
+  });
+
+  server.route({
+    method: 'GET',
     path: '/styles/{path*}',
     handler: {
       directory: {

@@ -29,3 +29,7 @@
   <input type="hidden" name="next" value="{{todayPlusInterval data.interval}}">
   <button type="submit">Mark as done</button>
 </form>
+
+<form action="/plugins/nagbot/formapi/nags/{{data.id}}/delete" method="post">
+  <button type="submit" class="danger">Delete</button>
+</form>

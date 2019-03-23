@@ -117,6 +117,18 @@ exports.register = (server, options, next) => {
     },
   });
 
+  server.route({
+    method: 'POST',
+    path: '/plugins/nagbot/formapi/nags/{id}/delete',
+    handler: (request, reply) => {
+      db.deleteNag(parseInt(request.params.id, 10))
+      .then(() => reply.view('nagbot/formapi-delete'))
+      .catch((error) =>
+        reply.view('nagbot/formapi-error', { operationType: 'deleted', error })
+      );
+    },
+  });
+
   next();
 };
 
