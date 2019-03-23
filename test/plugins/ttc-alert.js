@@ -10,7 +10,7 @@ const path = require('path');
 describe('ttcAlert Plugin', () => {
   let query;
   let server;
-  let wreck;
+  let cache;
 
   beforeEach(done => {
     const html = fs.readFileSync(path.join(__dirname, 'ttc-sample-data.html'), 'utf8');
@@ -19,8 +19,8 @@ describe('ttcAlert Plugin', () => {
     server = new Hapi.Server();
     server.connection({});
 
-    wreck = {
-      get: sinon.stub().yields(null, undefined, Buffer.from(html)),
+    cache = {
+      get: sinon.stub().returns(Promise.resolve(Buffer.from(html))),
     };
 
     server.start((err) => {
@@ -29,7 +29,7 @@ describe('ttcAlert Plugin', () => {
       }
 
       const plugin = proxyquire('../../plugins/ttc-alert', {
-        wreck,
+        '../cache.js': cache,
       });
 
       server.register(plugin);
@@ -45,7 +45,7 @@ describe('ttcAlert Plugin', () => {
   describe('#GET /plugins/ttc-alert', () => {
     describe('when there is an error loading the TTC data', () => {
       beforeEach(() => {
-        wreck.get.yields({ status: 404, statusMessage: 'Not found' });
+        cache.get.returns(Promise.reject('404 - Not found'));
       });
 
       it('should respond with a high priority payload', done => {
@@ -57,8 +57,7 @@ describe('ttcAlert Plugin', () => {
 
       it('should send the network error back with the response', done => {
         server.inject(query).then(response => {
-          expect(response.result.data.error.status).to.equal(404);
-          expect(response.result.data.error.statusMessage).to.equal('Not found');
+          expect(response.result.data.error).to.equal('404 - Not found');
           done();
         });
       });

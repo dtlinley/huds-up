@@ -1,5 +1,8 @@
-.container {
+.body {
   background-color: #eee;
+}
+
+.container {
   display: flex;
   flex-wrap: wrap;
 }
@@ -8,8 +11,8 @@
   background-color: white;
   border: 0.15em solid;
   box-shadow: 0.15em 0.15em 0.3em darkgray;
-  flex: 1 1 300px;
-  margin: 10px;
+  flex: 1 1 20em;
+  margin: 0.5em;
 }
 
 .card.high-priority {
@@ -28,7 +31,7 @@
   display: flex;
   font-family: "DejaVu Sans Mono";
   justify-content: space-between;
-  padding: 10px;
+  padding: 0.5em;
 }
 
 .card-header.high-priority {
@@ -48,11 +51,25 @@
 
 .card-body {
   font-family: "Liberation Sans";
-  padding: 10px;
+  padding: 0.5em;
 }
 
 .chart-container {
   height: 200px;
+}
+
+a {
+  padding: 1em;
+}
+
+form .form-element {
+  display: block;
+  margin: 1em;
+}
+
+form .form-control {
+  display: block;
+  margin: 0.5em;
 }
 
 h1 {

@@ -1,10 +1,11 @@
-const Hapi = require('hapi');
-const fs = require('fs');
-const wreck = require('wreck');
 const dotenv = require('dotenv');
-const vision = require('vision');
+const fs = require('fs');
 const inert = require('inert');
+const handlebars = require('handlebars');
+const Hapi = require('hapi');
 const views = require('./views/index.js');
+const vision = require('vision');
+const wreck = require('wreck');
 
 dotenv.config({ silent: true });
 const plugins = [];
@@ -17,6 +18,11 @@ const promise = new Promise((resolve, reject) => {
     if (serverErr) {
       reject(serverErr);
     }
+
+    server.views({
+      engines: { html: handlebars },
+      path: `${__dirname}/views`,
+    });
 
     server.on('log', (event) => {
       const date = (new Date(event.timestamp)).toISOString();
@@ -62,15 +68,24 @@ promise.then(srv => {
         }));
       });
       Promise.all(promises).then(
-        responses => reply(
-          responses
-          .filter(response => response.priority > 0)
-          .sort((a, b) => b.priority - a.priority)
-        ),
+        responses => {
+          reply(
+            responses
+            .reduce((acc, val) => acc.concat(val), [])
+            .filter(response => response.priority > 0)
+            .sort((a, b) => b.priority - a.priority)
+          );
+        },
         error => reply(`Error encountered while loading plugins:
           ${error.statusCode} ${error.statusMessage} ${error.req.path}`)
       );
     },
+  });
+
+  srv.on('request-internal', (request) => {
+    if (process.env.NODE_ENV !== 'test') {
+      srv.log(['info'], `#${request.method} ${request.path}`);
+    }
   });
 });
 

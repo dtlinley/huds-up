@@ -22,7 +22,7 @@
  * will be significantly less comfortable than today's, this will be the priority returned.
  */
 
-const wreck = require('wreck').defaults({ json: true });
+const cache = require('../cache.js');
 
 const EVENING_HOUR = 16;
 const IDEAL_TEMP_MAX = 25;
@@ -52,22 +52,11 @@ exports.register = (server, options, next) => {
         const start = Math.floor(date.getTime() / 1000);
         const path = `https://api.darksky.net/forecast/${apiKey}/${cityLatLong},${start}?units=ca`;
 
-        prior = new Promise((resolve, reject) => wreck.get(path, (err, res, payload) => {
-          if (err || res.statusCode !== 200) {
-            return reject(err || `${res.statusCode} - ${res.statusMessage}`);
-          }
-          return resolve(payload.daily.data[0]);
-        }));
+        prior = cache.get(path).then((payload) => payload.daily.data[0]);
       }
 
       const forecastPath = `https://api.darksky.net/forecast/${apiKey}/${cityLatLong}?units=ca`;
-      const forecast = new Promise((resolve, reject) =>
-      wreck.get(forecastPath, (err, res, payload) => {
-        if (err || res.statusCode !== 200) {
-          return reject(err || `${res.statusCode} - ${res.statusMessage}`);
-        }
-        return resolve(payload.daily.data);
-      }));
+      const forecast = cache.get(forecastPath).then((payload) => payload.daily.data);
 
       return Promise.all([prior, forecast]).then((values) => {
         const priorData = values[0];
@@ -82,6 +71,12 @@ exports.register = (server, options, next) => {
 
         response.data.current = current;
         response.data.next = upcoming;
+
+        if (!current || !upcoming) {
+          response.data.message = 'Missing data for forecasts';
+          return reply(response);
+        }
+
         const minTempDiff =
           upcoming.apparentTemperatureMin - current.apparentTemperatureMin;
         const maxTempDiff =

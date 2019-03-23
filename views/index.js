@@ -1,13 +1,7 @@
 const fs = require('fs');
 const handlebars = require('handlebars');
-// const Chart = require('chart.js');
 
 exports.register = (server, options, next) => {
-  server.views({
-    engines: { html: handlebars },
-    path: __dirname,
-  });
-
   const registerPartial = (partial) => {
     handlebars.registerPartial(
       partial,
@@ -20,16 +14,18 @@ exports.register = (server, options, next) => {
   registerPartial('backup-backintime');
   registerPartial('temperature-difference');
   registerPartial('umbrella-alert');
+  registerPartial('nagbot');
 
   handlebars.registerHelper('percent', (number) => number * 100);
   handlebars.registerHelper('toTimeString', (time) => {
     const date = new Date(time * 1000);
     return date.toLocaleTimeString();
   });
-  handlebars.registerHelper('date', (time) => {
+  handlebars.registerHelper('dateFromTime', (time) => {
     const date = new Date(time * 1000);
     return date.toDateString();
   });
+  handlebars.registerHelper('formatDate', (date) => date.toDateString());
   handlebars.registerHelper('round', (number) => Math.round(number));
   handlebars.registerHelper('isPositive', (number) => number > 0);
   handlebars.registerHelper('isNegative', (number) => number < 0);
@@ -37,6 +33,19 @@ exports.register = (server, options, next) => {
     if (priority >= 80) return 'high-priority';
     if (priority >= 50) return 'medium-priority';
     return 'low-priority';
+  });
+  handlebars.registerHelper('lessThan', (number, comparedTo) => number < comparedTo);
+
+  // Nagbot
+  handlebars.registerHelper('todayPlusInterval', (interval) => {
+    const date = new Date((new Date()).setHours(24, 0, 0, 0));
+    if (interval.days) {
+      return (new Date(date.setDate(date.getDate() + interval.days))).toISOString();
+    } else if (interval.months) {
+      return (new Date(date.setMonth(date.getMonth() + interval.months))).toISOString();
+    }
+
+    return date.toISOString();
   });
 
   server.route({
@@ -49,6 +58,14 @@ exports.register = (server, options, next) => {
         server.log(['error'], err);
         reply.view('index');
       });
+    },
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/nag/new',
+    handler: (request, reply) => {
+      reply.view('nagbot/new');
     },
   });
 

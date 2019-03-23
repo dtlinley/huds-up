@@ -10,7 +10,7 @@ describe('Umbrella Alert Plugin', () => {
   let DARKSKY_API_KEY;
   let query;
   let server;
-  let wreck;
+  let cache;
   let data;
 
   beforeEach(done => {
@@ -26,13 +26,11 @@ describe('Umbrella Alert Plugin', () => {
         throw err;
       }
 
-      wreck = {
+      cache = {
         get: sinon.stub(),
       };
       const plugin = proxyquire('../../plugins/umbrella-alert', {
-        wreck: {
-          defaults: () => wreck,
-        },
+        '../cache.js': cache,
       });
 
       server.register(plugin);
@@ -67,7 +65,7 @@ describe('Umbrella Alert Plugin', () => {
 
       it('should not attempt to fetch weather data', () => {
         server.inject(query);
-        expect(wreck.get.called).to.be.false;
+        expect(cache.get.called).to.be.false;
       });
     });
 
@@ -85,14 +83,15 @@ describe('Umbrella Alert Plugin', () => {
 
       it('should not attempt to fetch weather data', () => {
         server.inject(query);
-        expect(wreck.get.called).to.be.false;
+        expect(cache.get.called).to.be.false;
       });
     });
 
     describe('fetching rain data', () => {
       it('should make an API call to the weather service', () => {
+        cache.get.returns(Promise.reject('foobar'));
         server.inject(query);
-        expect(wreck.get.calledWithMatch(
+        expect(cache.get.calledWithMatch(
           'https://api.darksky.net/forecast/foobarapikey/12,-34'
         )).to.be.true;
       });
@@ -100,7 +99,7 @@ describe('Umbrella Alert Plugin', () => {
 
     describe('when the API call fails', () => {
       beforeEach(() => {
-        wreck.get.yields('Uh oh, something went wrong');
+        cache.get.returns(Promise.reject('Uh oh, something went wrong'));
       });
 
       it('should respond with a high priority message', done => {
@@ -119,7 +118,7 @@ describe('Umbrella Alert Plugin', () => {
             data: [],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with the summary for today', done => {
@@ -135,22 +134,22 @@ describe('Umbrella Alert Plugin', () => {
         data = {
           hourly: {
             data: [
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
-              { precipIntensity: 3.0 },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
+              { precipIntensity: 3.0, precipType: 'rain' },
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a high priority message', done => {
@@ -173,22 +172,22 @@ describe('Umbrella Alert Plugin', () => {
         data = {
           hourly: {
             data: [
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a low priority message', done => {
@@ -211,22 +210,22 @@ describe('Umbrella Alert Plugin', () => {
         data = {
           hourly: {
             data: [
-              { precipIntensity: 0.03 },
-              { precipIntensity: 0.005 },
-              { precipIntensity: 0.03 },
-              { precipIntensity: 0.05 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0.05 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0.1 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
+              { precipIntensity: 0.006, precipType: 'rain' },
+              { precipIntensity: 0.001, precipType: 'rain' },
+              { precipIntensity: 0.006, precipType: 'rain' },
+              { precipIntensity: 0.01, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0.01, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0.02, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a higher priority message than if rain isn\'t expected', done => {
@@ -249,50 +248,83 @@ describe('Umbrella Alert Plugin', () => {
         data = {
           hourly: {
             data: [
-              { precipIntensity: 0.05 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0.05 },
-              { precipIntensity: 0.05 },
-              { precipIntensity: 0.05 },
-              { precipIntensity: 0.05 },
-              { precipIntensity: 0.1 },
-              { precipIntensity: 0.2 },
-              { precipIntensity: 0.3 },
-              { precipIntensity: 0.2 },
-              { precipIntensity: 0.2 },
-              { precipIntensity: 0.2 },
+              { precipIntensity: 0.05, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0.05, precipType: 'rain' },
+              { precipIntensity: 0.05, precipType: 'rain' },
+              { precipIntensity: 0.05, precipType: 'rain' },
+              { precipIntensity: 0.05, precipType: 'rain' },
+              { precipIntensity: 0.1, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
+              { precipIntensity: 0.3, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
             ],
           },
         };
-        wreck.get.yields(null, null, data);
+        cache.get.returns(Promise.resolve(data));
       });
 
       it('should respond with a higher priority message than if no rain is expected soon, then lots of rain later', done => { // eslint-disable-line max-len
         const altData = {
           hourly: {
             data: [
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0 },
-              { precipIntensity: 0.1 },
-              { precipIntensity: 0.2 },
-              { precipIntensity: 0.5 },
-              { precipIntensity: 0.2 },
-              { precipIntensity: 0.2 },
-              { precipIntensity: 0.2 },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0, precipType: 'rain' },
+              { precipIntensity: 0.1, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
+              { precipIntensity: 0.5, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
+              { precipIntensity: 0.2, precipType: 'rain' },
             ],
           },
         };
-        wreck.get.yields(null, null, altData);
+        cache.get.returns(Promise.resolve(altData));
         server.inject(query).then(altResponse => {
-          wreck.get.yields(null, null, data);
+          cache.get.returns(Promise.resolve(data));
           server.inject(query).then(response => {
             expect(response.result.priority).to.be.above(altResponse.result.priority);
             done();
           });
+        });
+      });
+    });
+
+    describe('when there is snow expected in the future', () => {
+      beforeEach(() => {
+        data = {
+          hourly: {
+            data: [
+              { precipIntensity: 0.1, precipType: 'snow' },
+              { precipIntensity: 0.2, precipType: 'snow' },
+              { precipIntensity: 0.3, precipType: 'snow' },
+            ],
+          },
+        };
+        cache.get.returns(Promise.resolve(data));
+      });
+
+      it('should return snow data', (done) => {
+        server.inject(query).then((response) => {
+          expect(response.result.data.snow[0].mm).to.equal(0.1);
+          expect(response.result.data.snow[1].mm).to.equal(0.2);
+
+          expect(response.result.data.rain[0].mm).to.equal(0);
+          expect(response.result.data.rain[1].mm).to.equal(0);
+          done();
+        });
+      });
+
+      it('should return a low priority', (done) => {
+        server.inject(query).then((response) => {
+          expect(response.result.priority).to.be.below(20);
+          done();
         });
       });
     });

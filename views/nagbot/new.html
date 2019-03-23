@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/styles/main.css" type="text/css"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <title>Huds Up - Create a Nag</title>
+  </head>
+  <body class="body">
+    <div class="container">
+      <form class="form card" action="/plugins/nagbot/formapi/nags" method="post">
+        <section class="card-header">
+          Create A Nag
+        </section>
+
+        <section class="card-body">
+          <label class="form-element">
+            Nag Name
+            <input class="form-control" type="text" name="name" placeholder="Nag name" required=true>
+          </label>
+
+          <label class="form-element">
+            Interval
+            <div class="form-control">
+              <input type="number" name="intervalCount" placeholder="1" required=true>
+              <select name="intervalLength">
+                <option value="days">Days</option>
+                <option value="weeks">Weeks</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
+          </label>
+
+          <label class="form-element">
+            Next Occurence
+            <input class="form-control" type="date" name="next" required=true>
+          </label>
+        </section>
+
+        <section class="card-footer">
+          <button class="form-element" type="submit" name="submit">Save</button>
+        </section>
+      </form>
+    </div>
+  </body>
+</html>

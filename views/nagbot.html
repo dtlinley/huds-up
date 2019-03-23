@@ -1,0 +1,35 @@
+<section class="primary">
+  <strong>{{data.name}}</strong>
+</section>
+
+<section class="detail">
+  <p>
+    {{#if (isNegative data.daysToNext)}}
+      Overdue
+    {{else}}
+      {{#if (lessThan data.daysToNext 1)}}
+        Due today
+      {{else}}
+        Due in {{round data.daysToNext}} days
+      {{/if}}
+    {{/if}}
+  </p>
+  <p>
+    {{#if data.interval.days}}
+      Every {{data.interval.days}} days
+    {{else}}
+      {{#if data.interval.months}}
+        Every {{data.interval.months}} months
+      {{/if}}
+    {{/if}}
+  </p>
+</section>
+
+<form action="/plugins/nagbot/formapi/nags/{{data.id}}" method="post">
+  <input type="hidden" name="next" value="{{todayPlusInterval data.interval}}">
+  <button type="submit">Mark as done</button>
+</form>
+
+<form action="/plugins/nagbot/formapi/nags/{{data.id}}/delete" method="post">
+  <button type="submit" class="danger">Delete</button>
+</form>
