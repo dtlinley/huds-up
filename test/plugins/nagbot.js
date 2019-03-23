@@ -23,6 +23,7 @@ describe('nagbot Plugin', () => {
 
       db = {
         getNags: sinon.stub(),
+        getNag: sinon.stub(),
         updateNag: sinon.stub(),
         createNag: sinon.stub(),
       };
@@ -233,11 +234,45 @@ describe('nagbot Plugin', () => {
     });
   });
 
-  describe('#PUT /plugins/nagbot/nags/<id>', () => {
-    it('should allow the nag to be updated');
+  describe.only('#PUT /plugins/nagbot/nags/<id>', () => {
+    beforeEach(() => {
+      query = {
+        method: 'PUT',
+        url: '/plugins/nagbot/nags/123',
+        payload: {
+          next: '2018-01-01T12:00:00Z',
+        },
+      };
+      db.updateNag.returns(Promise.resolve());
+      db.getNag.returns(Promise.resolve({ id: 123, name: 'Sample name', interval: '1 week' }));
+    });
+
+    it('should allow the nag to be updated', (done) => {
+      server.inject(query).then(() => {
+        expect(db.updateNag.calledWith(123, { next: '2018-01-01T12:00:00Z' })).to.be.ok;
+        done();
+      });
+    });
+
+    it('should respond with the updated nag', (done) => {
+      server.inject(query).then((response) => {
+        expect(response.result.id).to.equal(123);
+        expect(response.result.name).to.equal('Sample name');
+        done();
+      });
+    });
 
     describe('when the database call fails', () => {
-      it('should respond with an error message');
+      beforeEach(() => {
+        db.updateNag.rejects('db call failed');
+      });
+
+      it('should respond with an error message', (done) => {
+        server.inject(query).then((response) => {
+          expect(response.result.data.error.name).to.have.string('db call failed');
+          done();
+        });
+      });
     });
   });
 

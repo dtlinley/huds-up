@@ -27,4 +27,10 @@ module.exports = {
       [id].concat(values)
     ).catch(exception => Promise.reject(exception.message));
   }),
+
+  getNag: (id) => clientPromise.then((client) =>
+    client.query('SELECT * FROM nags WHERE id = $1', id)
+    .then((result) => result.rows[0])
+    .catch((exception) => Promise.reject(exception.message))
+  ),
 };

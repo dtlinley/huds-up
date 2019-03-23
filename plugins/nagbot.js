@@ -69,6 +69,20 @@ exports.register = (server, options, next) => {
   });
 
   server.route({
+    method: 'PUT',
+    path: '/plugins/nagbot/nags/{id}',
+    handler: (request, reply) => {
+      const id = parseInt(request.params.id, 10);
+      db.updateNag(id, request.payload)
+      .then(() => db.getNag(id))
+      .then((nag) => reply(nag))
+      .catch((error) =>
+        reply({ data: { error, message: 'Update failed. Please try again later.' } })
+      );
+    },
+  });
+
+  server.route({
     method: 'POST',
     path: '/plugins/nagbot/formapi/nags',
     handler: (request, reply) => {
