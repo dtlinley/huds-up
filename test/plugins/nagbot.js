@@ -243,8 +243,7 @@ describe('nagbot Plugin', () => {
           next: '2018-01-01T12:00:00Z',
         },
       };
-      db.updateNag.resolves();
-      db.getNag.resolves({ id: 123, name: 'Sample name', interval: '1 week' });
+      db.updateNag.resolves({ id: 123, name: 'Sample name', interval: '1 week' });
     });
 
     it('should allow the nag to be updated', (done) => {
@@ -288,8 +287,7 @@ describe('nagbot Plugin', () => {
           next: '2018-01-01T12:00:00Z',
         },
       };
-      db.createNag.resolves(1);
-      db.getNag.withArgs(1).resolves({
+      db.createNag.resolves({
         id: 1,
         name: 'Newly created plugin',
         intervalCount: '3',

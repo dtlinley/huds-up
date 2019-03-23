@@ -12,10 +12,25 @@ const clientPromise = new Promise((resolve, reject) => {
 });
 
 module.exports = {
+  createNag: (nag) => clientPromise.then((client) =>
+    client.query(
+      'INSERT INTO nags (name, interval, next) VALUES ($1, $2, $3) RETURNING *',
+      [nag.name, nag.interval, nag.next]
+    )
+    .then((result) => result.rows[0])
+    .catch((exception) => Promise.reject(exception.message))
+  ),
+
   getNags: () => clientPromise.then(
-    client => client.query('SELECT * FROM nags').then(
-      result => result.rows
-    ).catch(exception => Promise.reject(exception.message))
+    client => client.query('SELECT * FROM nags')
+    .then(result => result.rows)
+    .catch(exception => Promise.reject(exception.message))
+  ),
+
+  getNag: (id) => clientPromise.then((client) =>
+    client.query('SELECT * FROM nags WHERE id = $1', [id])
+    .then((result) => result.rows[0])
+    .catch((exception) => Promise.reject(exception.message))
   ),
 
   updateNag: (id, nag) => clientPromise.then(client => {
@@ -23,14 +38,16 @@ module.exports = {
     const values = keys.map(key => nag[key]);
     const updateString = keys.map((key, index) => `${key} = $${index + 2}`);
     return client.query(
-      `UPDATE nags SET ${updateString} WHERE id = $1`,
+      `UPDATE nags SET ${updateString} WHERE id = $1 RETURNING *`,
       [id].concat(values)
-    ).catch(exception => Promise.reject(exception.message));
+    )
+    .then((result) => result.rows[0])
+    .catch(exception => Promise.reject(exception.message));
   }),
 
-  getNag: (id) => clientPromise.then((client) =>
-    client.query('SELECT * FROM nags WHERE id = $1', id)
-    .then((result) => result.rows[0])
+  deleteNag: (id) => clientPromise.then((client) =>
+    client.query('DELETE FROM nags WHERE id = $1', [id])
+    .then(() => Promise.resolve())
     .catch((exception) => Promise.reject(exception.message))
   ),
 };

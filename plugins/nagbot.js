@@ -74,7 +74,6 @@ exports.register = (server, options, next) => {
     handler: (request, reply) => {
       const id = parseInt(request.params.id, 10);
       db.updateNag(id, request.payload)
-      .then(() => db.getNag(id))
       .then((nag) => reply(nag))
       .catch((error) =>
         reply({ data: { error, message: 'Update failed. Please try again later.' } })
@@ -111,7 +110,6 @@ exports.register = (server, options, next) => {
           `${request.payload.intervalCount} ${request.payload.intervalLength}`,
       };
       db.createNag(nag)
-      .then((id) => db.getNag(id))
       .then((newNag) => reply(newNag))
       .catch(error => {
         reply({ data: { error, message: 'Failed to create nag. Please try again later.' } });
