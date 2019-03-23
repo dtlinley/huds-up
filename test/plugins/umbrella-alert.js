@@ -297,9 +297,36 @@ describe('Umbrella Alert Plugin', () => {
     });
 
     describe('when there is snow expected in the future', () => {
-      it('should return snow data');
+      beforeEach(() => {
+        data = {
+          hourly: {
+            data: [
+              { precipIntensity: 0.1, precipType: 'snow' },
+              { precipIntensity: 0.2, precipType: 'snow' },
+              { precipIntensity: 0.3, precipType: 'snow' },
+            ],
+          },
+        };
+        cache.get.returns(Promise.resolve(data));
+      });
 
-      it('should return a low priority');
+      it('should return snow data', (done) => {
+        server.inject(query).then((response) => {
+          expect(response.result.data.snow[0].mm).to.equal(0.1);
+          expect(response.result.data.snow[1].mm).to.equal(0.2);
+
+          expect(response.result.data.rain[0].mm).to.equal(0);
+          expect(response.result.data.rain[1].mm).to.equal(0);
+          done();
+        });
+      });
+
+      it('should return a low priority', (done) => {
+        server.inject(query).then((response) => {
+          expect(response.result.priority).to.be.below(20);
+          done();
+        });
+      });
     });
   });
 });
