@@ -23,7 +23,19 @@ var myChart = new Chart(ctx, {
           ],
           borderColor: '#2e6da4',
           backgroundColor: '#337ab7',
-        }
+        },
+        {{#if data.snow}}
+        {
+          label: 'Snow (mm)',
+          data: [
+            {{#each data.snow}}
+            {{mm}},
+            {{/each}}
+          ],
+          borderColor: '#fdfdfd',
+          backgroundColor: '#aeaeae',
+        },
+        {{/if}}
       ],
     },
     options: {
