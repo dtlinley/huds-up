@@ -234,7 +234,7 @@ describe('nagbot Plugin', () => {
     });
   });
 
-  describe.only('#PUT /plugins/nagbot/nags/<id>', () => {
+  describe('#PUT /plugins/nagbot/nags/<id>', () => {
     beforeEach(() => {
       query = {
         method: 'PUT',
@@ -243,8 +243,8 @@ describe('nagbot Plugin', () => {
           next: '2018-01-01T12:00:00Z',
         },
       };
-      db.updateNag.returns(Promise.resolve());
-      db.getNag.returns(Promise.resolve({ id: 123, name: 'Sample name', interval: '1 week' }));
+      db.updateNag.resolves();
+      db.getNag.resolves({ id: 123, name: 'Sample name', interval: '1 week' });
     });
 
     it('should allow the nag to be updated', (done) => {
@@ -277,12 +277,56 @@ describe('nagbot Plugin', () => {
   });
 
   describe('#POST /plugins/nagbot/nags', () => {
-    it('should create a new nag');
+    beforeEach(() => {
+      query = {
+        method: 'POST',
+        url: '/plugins/nagbot/nags',
+        payload: {
+          name: 'Newly created plugin',
+          intervalCount: '3',
+          intervalLength: 'days',
+          next: '2018-01-01T12:00:00Z',
+        },
+      };
+      db.createNag.resolves(1);
+      db.getNag.withArgs(1).resolves({
+        id: 1,
+        name: 'Newly created plugin',
+        intervalCount: '3',
+        intervalLength: 'days',
+        next: '2018-01-01T12:00:00Z',
+      });
+    });
 
-    it('should respond with the new nag');
+    it('should create a new nag', (done) => {
+      server.inject(query).then(() => {
+        expect(db.createNag.calledWith({
+          name: 'Newly created plugin',
+          interval: '3 days',
+          next: '2018-01-01T12:00:00Z',
+        })).to.be.ok;
+        done();
+      });
+    });
+
+    it('should respond with the new nag', (done) => {
+      server.inject(query).then((response) => {
+        expect(response.result.id).to.equal(1);
+        done();
+      });
+    });
 
     describe('when the database call fails', () => {
-      it('should respond with an error message');
+      beforeEach(() => {
+        db.createNag.rejects('create call failed');
+      });
+
+      it('should respond with an error message', (done) => {
+        server.inject(query).then((response) => {
+          expect(response.result.data.error.name).to.have.string('create call failed');
+          done();
+        });
+      });
     });
   });
 });

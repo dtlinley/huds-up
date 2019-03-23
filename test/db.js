@@ -80,6 +80,8 @@ describe('Database', () => {
       });
     });
 
+    it('should return the ID of the updated nag');
+
     describe('with only one property being updated', () => {
       it('should update only that property of the nag', done => {
         db.updateNag(123, updatePayload).then(() => {
@@ -119,7 +121,7 @@ describe('Database', () => {
   describe('#createNag', () => {
     it('should add a nag to the database');
 
-    it('should respond with the new nag');
+    it('should respond with the new nag\'s ID');
 
     describe('when the database fails', () => {
       it('should return a rejected promise');

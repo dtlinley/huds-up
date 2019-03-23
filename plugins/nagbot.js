@@ -100,6 +100,25 @@ exports.register = (server, options, next) => {
     },
   });
 
+  server.route({
+    method: 'POST',
+    path: '/plugins/nagbot/nags',
+    handler: (request, reply) => {
+      const nag = {
+        name: request.payload.name,
+        next: request.payload.next,
+        interval:
+          `${request.payload.intervalCount} ${request.payload.intervalLength}`,
+      };
+      db.createNag(nag)
+      .then((id) => db.getNag(id))
+      .then((newNag) => reply(newNag))
+      .catch(error => {
+        reply({ data: { error, message: 'Failed to create nag. Please try again later.' } });
+      });
+    },
+  });
+
   next();
 };
 
