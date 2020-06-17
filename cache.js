@@ -12,7 +12,11 @@ module.exports = {
     }
 
     cached[url] = new Promise((resolve, reject) => {
-      wreck.get(url, (err, res, payload) => {
+      const headers = {
+        'User-Agent': 'curl/7.58.0',
+        Accept: '*/*',
+      };
+      wreck.get(url, { headers }, (err, res, payload) => {
         if (err) {
           console.log(`${url} returned error: ${err}`); // eslint-disable-line no-console
           return reject(err);
