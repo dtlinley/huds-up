@@ -2,11 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="/styles/main.css" type="text/css"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
     <title>Huds Up</title>
   </head>
   <body class="body">
+    <script type="text/javascript">
+      window.setInterval(() => {
+        location.reload()
+      }, (1000 * 60 * 30));
+    </script>
     <a href="nag/new">Create a Nag</a>
     <div class="container">
       {{#each plugins}}
