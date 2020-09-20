@@ -1,0 +1,16 @@
+.nag-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.nag-buttons .nag-button-primary {
+  flex-grow: 2;
+}
+
+.nag-buttons .nag-button-secondary {
+  flex-grow: 1;
+}
+
+.nag-buttons button {
+  width: 95%;
+}
