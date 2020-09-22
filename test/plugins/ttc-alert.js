@@ -104,9 +104,9 @@ describe('ttcAlert Plugin', () => {
         process.env.TTC_ROUTES_STATIONS = routes;
       });
 
-      it('should respond with a high priority message', done => {
+      it('should respond with a medium priority message', done => {
         server.inject(query).then(response => {
-          expect(response.result.priority).to.be.above(70);
+          expect(response.result.priority).to.be.above(20);
           done();
         });
       });

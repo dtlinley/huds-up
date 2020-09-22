@@ -6,6 +6,7 @@ const cache = require('../cache.js');
 const ALERT_URL = 'http://www.ttc.ca/Service_Advisories/all_service_alerts.jsp';
 const ELEVATOR_BROKEN = 'Elevator out of service';
 const ELEVATOR_FIXED = 'Elevator back in service';
+const HIGH_PRIORITY = 30;
 
 exports.register = (server, options, next) => {
   server.route({
@@ -34,7 +35,7 @@ exports.register = (server, options, next) => {
 
         let priority = filtered.length > 0 ? 10 : 3;
         if (important.length > 0) {
-          priority = 85;
+          priority = HIGH_PRIORITY;
         }
         const data = { priority, type: 'ttc-alert', data: { alerts: filtered } };
 
