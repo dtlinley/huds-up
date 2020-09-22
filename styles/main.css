@@ -58,6 +58,10 @@
   height: 200px;
 }
 
+.navigation {
+  display: block;
+}
+
 a {
   padding: 1em;
 }
