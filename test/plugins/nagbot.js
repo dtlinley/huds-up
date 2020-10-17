@@ -73,6 +73,7 @@ describe('nagbot Plugin', () => {
           { id: 1, name: 'Water the plants', interval: { days: 14 }, next: '2018-01-15T00:00:00Z' },
           { id: 2, name: 'Wash towels', interval: { days: 7 }, next: '2018-01-08T00:00:00Z' },
           { id: 3, name: 'Do this daily', interval: { days: 1 }, next: '2018-01-08T18:00:00Z' },
+          { id: 4, name: 'Overdue task', interval: { days: 21 }, next: '2018-01-01T18:00:00Z' },
         ]));
 
         fakeDate = new Date('2018-01-07T18:00:00Z');
@@ -86,7 +87,7 @@ describe('nagbot Plugin', () => {
       it('should return an array of plugin-response objects', done => {
         server.inject(query).then(response => {
           expect(Array.isArray(response.result)).to.be.true;
-          expect(response.result.length).to.equal(3);
+          expect(response.result.length).to.equal(4);
           done();
         });
       });
@@ -132,6 +133,15 @@ describe('nagbot Plugin', () => {
           expect(
             response.result.find(nag => nag.data.id === 3).priority
           ).to.be.lessThan(10);
+          done();
+        });
+      });
+
+      it('should not exceed the highest priority when a task is overdue', done => {
+        server.inject(query).then(response => {
+          expect(
+            response.result.find(nag => nag.data.id === 4).priority
+          ).to.be.lessThan(90);
           done();
         });
       });

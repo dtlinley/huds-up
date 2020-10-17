@@ -19,7 +19,10 @@ const proportionTimeLeft = (nextOccurence, interval) => {
     );
   }
 
-  return (nextOccurence - today) / Math.max(1, (todayPlusInterval - today));
+  return Math.max(
+    0,
+    (nextOccurence - today) / Math.max(1, (todayPlusInterval - today))
+  );
 };
 
 exports.register = (server, options, next) => {
