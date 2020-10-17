@@ -6,6 +6,22 @@ const MS_IN_DAY = 86400000;
 const MAX_PRIORITY = 85;
 const DAMPENING_FACTOR = 1.3;
 
+const proportionTimeLeft = (nextOccurence, interval) => {
+  const today = new Date();
+  let todayPlusInterval = new Date();
+  if (interval.days) {
+    todayPlusInterval = new Date(
+      todayPlusInterval.setDate(todayPlusInterval.getDate() + interval.days)
+    );
+  } else if (interval.months) {
+    todayPlusInterval = new Date(
+      todayPlusInterval.setMonth(todayPlusInterval.getMonth() + interval.months)
+    );
+  }
+
+  return (nextOccurence - today) / Math.max(1, (todayPlusInterval - today));
+};
+
 exports.register = (server, options, next) => {
   server.route({
     method: 'GET',
@@ -25,7 +41,8 @@ exports.register = (server, options, next) => {
             (1 / DAMPENING_FACTOR),
             daysToNext + 1
           );
-          const priority = MAX_PRIORITY / (DAMPENING_FACTOR * adjustedDays);
+          const proportionLeft = proportionTimeLeft(nextOccurence, nag.interval);
+          const priority = MAX_PRIORITY * (1 - proportionLeft) / (DAMPENING_FACTOR * adjustedDays);
 
           return {
             priority,

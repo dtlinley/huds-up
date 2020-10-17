@@ -70,8 +70,9 @@ describe('nagbot Plugin', () => {
 
       beforeEach(() => {
         db.getNags.returns(Promise.resolve([
-          { id: 1, name: 'Water the plants', interval: '2 weeks', next: '2018-01-15T00:00:00Z' },
-          { id: 2, name: 'Wash towels', interval: '1 weeks', next: '2018-01-08T00:00:00Z' },
+          { id: 1, name: 'Water the plants', interval: { days: 14 }, next: '2018-01-15T00:00:00Z' },
+          { id: 2, name: 'Wash towels', interval: { days: 7 }, next: '2018-01-08T00:00:00Z' },
+          { id: 3, name: 'Do this daily', interval: { days: 1 }, next: '2018-01-08T18:00:00Z' },
         ]));
 
         fakeDate = new Date('2018-01-07T18:00:00Z');
@@ -85,7 +86,7 @@ describe('nagbot Plugin', () => {
       it('should return an array of plugin-response objects', done => {
         server.inject(query).then(response => {
           expect(Array.isArray(response.result)).to.be.true;
-          expect(response.result.length).to.equal(2);
+          expect(response.result.length).to.equal(3);
           done();
         });
       });
@@ -122,6 +123,15 @@ describe('nagbot Plugin', () => {
           expect(
             response.result.find(nag => nag.data.id === 1).data.name
           ).to.equal('Water the plants');
+          done();
+        });
+      });
+
+      it('should have a low priority for nags which have just been marked done', done => {
+        server.inject(query).then(response => {
+          expect(
+            response.result.find(nag => nag.data.id === 3).priority
+          ).to.be.lessThan(10);
           done();
         });
       });

@@ -29,7 +29,7 @@
 
 .card-header {
   display: flex;
-  font-family: "DejaVu Sans Mono";
+  font-family: "Courier New", monospace;
   justify-content: space-between;
   padding: 0.5em;
 }
@@ -50,7 +50,7 @@
 }
 
 .card-body {
-  font-family: "Liberation Sans";
+  font-family: "Helvetica", "Arial", sans-serif;
   padding: 0.5em;
 }
 
