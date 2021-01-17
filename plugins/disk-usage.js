@@ -37,9 +37,11 @@ exports.register = (server, options, next) => {
           response.data.message =
             'Disk monitor is looking for disk mounts, but no matching mounts found';
         } else if (filtered.length > 0) {
-          const highCapacity = filtered.reduce((max, info) => Math.max(max, info.capacity), 0);
+          const highCapacity = parseFloat(
+            filtered.reduce((max, info) => Math.max(max, info.capacity), 0).toFixed(2)
+          );
           const priority = ((highCapacity * 100) - CARE_THRESHOLD) * SCALING_FACTOR;
-          response.priority = parseFloat(Math.max(priority, 2).toFixed(2));
+          response.priority = Math.max(priority, 2);
         }
         return reply(response);
       });
