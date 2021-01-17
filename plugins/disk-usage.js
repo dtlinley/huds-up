@@ -39,7 +39,7 @@ exports.register = (server, options, next) => {
         } else if (filtered.length > 0) {
           const highCapacity = filtered.reduce((max, info) => Math.max(max, info.capacity), 0);
           const priority = ((highCapacity * 100) - CARE_THRESHOLD) * SCALING_FACTOR;
-          response.priority = Math.max(priority, 2);
+          response.priority = parseFloat(Math.max(priority, 2).toFixed(2));
         }
         return reply(response);
       });
