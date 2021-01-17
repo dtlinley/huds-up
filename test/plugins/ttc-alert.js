@@ -63,6 +63,26 @@ describe('ttcAlert Plugin', () => {
       });
     });
 
+    describe('when the user has no stops or routes selected', () => {
+      let routes;
+
+      beforeEach(() => {
+        routes = process.env.TTC_ROUTES_STATIONS;
+        process.env.TTC_ROUTES_STATIONS = '';
+      });
+
+      afterEach(() => {
+        process.env.TTC_ROUTES_STATIONS = routes;
+      });
+
+      it('should respond with a zero priority message', done => {
+        server.inject(query).then(response => {
+          expect(response.result.priority).to.equal(0);
+          done();
+        });
+      });
+    });
+
     describe('when there are no alerts currently affecting the user', () => {
       let routes;
 

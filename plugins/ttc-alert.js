@@ -13,7 +13,13 @@ exports.register = (server, options, next) => {
     method: 'GET',
     path: '/plugins/ttc-alert',
     handler: (request, reply) => {
-      cache.get(ALERT_URL).then((payload) => {
+      if (process.env.TTC_ROUTES_STATIONS === '') {
+        const response = { priority: 0, type: 'ttc-alert', data: {} };
+
+        return reply(response);
+      }
+
+      return cache.get(ALERT_URL).then((payload) => {
         const dom = cheerio.load(payload.toString());
         const alerts = [];
         dom('.alert-content p.veh-replace').map((i, elem) => dom(elem).text())
@@ -39,7 +45,7 @@ exports.register = (server, options, next) => {
         }
         const data = { priority, type: 'ttc-alert', data: { alerts: filtered } };
 
-        return reply(data);
+        reply(data);
       }).catch((err) => {
         reply({ priority: 80, type: 'ttc-alert', data: { error: err } });
       });
