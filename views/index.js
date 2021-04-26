@@ -16,9 +16,12 @@ exports.register = (server, options, next) => {
   registerPartial('umbrella-alert');
   registerPartial('nagbot');
 
-  handlebars.registerHelper('percent', (number) => number * 100);
+  handlebars.registerHelper('percent', (number) => Math.floor(number * 100));
   handlebars.registerHelper('toTimeString', (time) => {
     const date = new Date(time * 1000);
+    if (date.getHours() === 0) {
+      return date.toDateString();
+    }
     return date.toLocaleTimeString();
   });
   handlebars.registerHelper('dateFromTime', (time) => {
