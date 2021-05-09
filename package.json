@@ -20,7 +20,7 @@
     "chart.js": "^2.9.3",
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "hapi": "^16.7.0",
     "hapi-react": "^5.0.1",
     "inert": "^4.2.1",
