@@ -43,9 +43,11 @@ var precipitation = new Chart(ctx, {
     options: {
       maintainAspectRatio: false,
       scales: {
-        y: {
-          suggestedMax: 0.3,
-        },
+        yAxes: [{
+          ticks: {
+            suggestedMax: 0.025,
+          },
+        }],
       },
     },
 });
