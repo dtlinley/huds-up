@@ -17,7 +17,7 @@
   "author": "David Linley",
   "license": "ISC",
   "dependencies": {
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
     "handlebars": "^4.7.7",
