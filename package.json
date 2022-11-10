@@ -38,7 +38,7 @@
     "eslint-plugin-import": "^1.16.0",
     "eslint-plugin-jsx-a11y": "^1.5.5",
     "eslint-plugin-react": "^5.2.2",
-    "mocha": "^8.2.0",
+    "mocha": "^10.1.0",
     "proxyquire": "^1.8.0",
     "sinon": "^7.5.0"
   }
