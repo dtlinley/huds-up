@@ -18,7 +18,10 @@ exports.register = (server, options, next) => {
 
   handlebars.registerHelper('percent', (number) => Math.floor(number * 100));
   handlebars.registerHelper('toTimeString', (time) => {
-    const date = new Date(time * 1000);
+    // Input like "202304022200"
+    // Should output the locale time string version of April 2nd, 2023, 22:00Z
+    const formatted = `${time.substring(0, 4)}-${time.substring(4, 6)}-${time.substring(6, 8)}T${time.substring(8, 10)}:00:00Z`; // eslint-disable-line max-len
+    const date = new Date(formatted);
     if (date.getHours() === 0) {
       return date.toDateString();
     }

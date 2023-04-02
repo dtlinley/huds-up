@@ -2,51 +2,45 @@
 
 // const wreck = require('wreck').defaults({ json: true });
 const cache = require('../cache.js');
+const parser = require('xml2json');
 
 // the number of forecasts to consider; users generally don't care about whether an umbrella is
 // needed more than 12 hours in the future
 const FORECAST_RELEVANCE = 12;
 const DEPRESSION_FACTOR = 5; // if there's rain soon then later rain is less important by a factor
 const INITIAL_IMPORTANCE = 50; // if it will rain heavily in the next hour, how important is that
-const HIGH_RAIN_THRESHOLD = 0.01; // how many mm of rain are considered "a lot" of rain in 1 hour
+const HIGH_RAIN_THRESHOLD = 80; // what percent chance of rain is "a lot" of rain in 1 hour
 
 exports.register = (server, options, next) => {
   server.route({
     method: 'GET',
     path: '/plugins/umbrella-alert',
     handler: (request, reply) => {
-      const cityLatLong = process.env.WEATHER_CITY_COORDS;
-      const apiKey = process.env.DARKSKY_API_KEY;
-      if (!cityLatLong || !apiKey) {
-        const response = { priority: 0, type: 'umbrella-alert', data: {} };
-
-        return reply(response);
-      }
-
-      const apiBase = 'https://api.darksky.net/forecast';
-      const url = `${apiBase}/${apiKey}/${cityLatLong}`;
+      const stationId = process.env.WEATHER_STATION_ID;
+      const url = `https://dd.weather.gc.ca/citypage_weather/xml/ON/${stationId}.xml`;
       return cache.get(url).then((payload) => {
+        const json = parser.toJson(payload, { object: true });
+        const weatherData = json.siteData;
+        const forecasts = weatherData.forecastGroup.forecast;
+        const hourlyForecasts = weatherData.hourlyForecastGroup.hourlyForecast;
         const response = {
           priority: 0,
           type: 'umbrella-alert',
-          data: { message: payload.hourly.summary },
+          data: { message: forecasts[0].textSummary },
         };
-        const precipData = (type) => payload.hourly.data.map(forecast => {
-          let mm = 0;
-          if (forecast.precipType === type && forecast.precipIntensity) {
-            mm = forecast.precipIntensity;
-          }
-          return { mm, time: forecast.time };
-        });
-        response.data.rain = precipData('rain');
-        response.data.snow = precipData('snow');
+
+
+        const precip = hourlyForecasts.map(
+          forecast => ({ percentage: forecast.lop.$t, time: forecast.dateTimeUTC })
+        );
+        response.data.rain = precip;
 
         const importance = (data, max, depression) => {
           if (data.length <= 0 || max <= 0) {
             return 0;
           }
 
-          const amount = Math.min(data[0].mm / HIGH_RAIN_THRESHOLD, 1);
+          const amount = Math.min(data[0].percentage / HIGH_RAIN_THRESHOLD, 1);
           const current = (amount * max) / depression;
           const nextMax = max - (INITIAL_IMPORTANCE / FORECAST_RELEVANCE);
           const nextDepression = ((amount * (DEPRESSION_FACTOR - 1)) + 1) * depression;

@@ -59,7 +59,7 @@ promise.then(srv => {
       const promises = [];
       plugins.forEach(plugin => {
         promises.push(new Promise((resolve, reject) => {
-          wreck.get(`${srv.info.uri}/plugins/${plugin}`, null, (err, response, payload) => {
+          wreck.get(`http://localhost:9010/plugins/${plugin}`, null, (err, response, payload) => {
             if (err) {
               return reject(err);
             }
@@ -76,8 +76,7 @@ promise.then(srv => {
             .sort((a, b) => b.priority - a.priority)
           );
         },
-        error => reply(`Error encountered while loading plugins:
-          ${error.statusCode} ${error.statusMessage} ${error.req.path}`)
+        error => reply(`Error encountered while loading plugins: ${error}`)
       );
     },
   });

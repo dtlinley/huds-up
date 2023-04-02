@@ -10,22 +10,18 @@
   <table class="temperature-blocks">
     <tr class="temperature-block">
       <td>High</td>
-      <td class="next">{{round data.next.apparentTemperatureMax}}&deg;C</td>
-      <td class="current">{{round data.current.apparentTemperatureMax}}&deg;C</td>
+      <td class="next">{{round data.forecast.high}}&deg;C</td>
+      <td class="current">{{round data.average.high}}&deg;C</td>
     </tr>
 
     <tr class="temperature-block">
       <td>Low</td>
-      <td class="next">{{round data.next.apparentTemperatureMin}}&deg;C</td>
-      <td class="current">{{round data.current.apparentTemperatureMin}}&deg;C</td>
+      <td class="next">{{round data.forecast.low}}&deg;C</td>
+      <td class="current">{{round data.average.low}}&deg;C</td>
     </tr>
   </table>
 </section>
 
 <section>
-  <p><strong>{{dateFromTime data.current.time}}:</strong> {{data.current.summary}}</p>
-</section>
-
-<section>
-  <p><strong>{{dateFromTime data.next.time}}:</strong> {{data.next.summary}}</p>
+  <p>{{data.message}}</p>
 </section>

@@ -23,8 +23,8 @@
  */
 
 const cache = require('../cache.js');
+const parser = require('xml2json');
 
-const EVENING_HOUR = 16;
 const IDEAL_TEMP_MAX = 25;
 const IDEAL_TEMP_MIN = 20;
 const LARGE_TEMPERATURE_DIFFERENCE = 10;
@@ -35,60 +35,52 @@ exports.register = (server, options, next) => {
     method: 'GET',
     path: '/plugins/temperature-difference',
     handler: (request, reply) => {
-      const cityLatLong = process.env.WEATHER_CITY_COORDS;
-      const apiKey = process.env.DARKSKY_API_KEY;
-      if (!cityLatLong || !apiKey) {
-        const response = { priority: 0, type: 'umbrella-alert', data: {} };
-
-        return reply(response);
-      }
-
       const response = { priority: 0, type: 'temperature-difference', data: {} };
 
-      let prior = Promise.resolve({});
-      if ((new Date()).getHours() < EVENING_HOUR) {
-        const date = new Date();
-        date.setDate(date.getDate() - 1);
-        const start = Math.floor(date.getTime() / 1000);
-        const path = `https://api.darksky.net/forecast/${apiKey}/${cityLatLong},${start}?units=ca`;
+      const stationId = process.env.WEATHER_STATION_ID;
+      const url = `https://dd.weather.gc.ca/citypage_weather/xml/ON/${stationId}.xml`;
 
-        prior = cache.get(path).then((payload) => payload.daily.data[0]);
-      }
+      return cache.get(url).then((payload) => {
+        const json = parser.toJson(payload, { object: true });
+        const weatherData = json.siteData;
+        const forecasts = weatherData.forecastGroup.forecast;
+        const averages = weatherData.forecastGroup.regionalNormals;
 
-      const forecastPath = `https://api.darksky.net/forecast/${apiKey}/${cityLatLong}?units=ca`;
-      const forecast = cache.get(forecastPath).then((payload) => payload.daily.data);
+        const averageHigh = parseInt(averages.temperature.find(t => t.class === 'high').$t, 10);
+        const averageLow = parseInt(averages.temperature.find(t => t.class === 'low').$t, 10);
 
-      return Promise.all([prior, forecast]).then((values) => {
-        const priorData = values[0];
-        const forecastData = values[1];
-        let current = forecastData[0];
-        let upcoming = forecastData[1];
+        const forecastHigh = parseInt(
+          forecasts.find(f => f.temperatures.temperature.class === 'high')
+            .temperatures.temperature.$t
+        , 10);
+        const forecastLow = parseInt(
+          forecasts.find(f => f.temperatures.temperature.class === 'low')
+            .temperatures.temperature.$t
+        , 10);
 
-        if ((new Date()).getHours() < EVENING_HOUR) {
-          current = priorData;
-          upcoming = forecastData[0];
-        }
-
-        response.data.current = current;
-        response.data.next = upcoming;
-
-        if (!current || !upcoming) {
-          response.data.message = 'Missing data for forecasts';
-          return reply(response);
-        }
+        response.data.message = forecasts[0].textSummary;
+        response.data.average = {
+          high: averageHigh,
+          low: averageLow,
+        };
+        response.data.forecast = {
+          high: forecastHigh,
+          low: forecastLow,
+        };
 
         const minTempDiff =
-          upcoming.apparentTemperatureMin - current.apparentTemperatureMin;
+          forecastLow - averageLow;
         const maxTempDiff =
-          upcoming.apparentTemperatureMax - current.apparentTemperatureMax;
+          forecastHigh - averageHigh;
+
         const delta = Math.min(
           1,
           (Math.abs(minTempDiff) + Math.abs(maxTempDiff)) / LARGE_TEMPERATURE_DIFFERENCE
         );
         response.data.averageTemperatureDifference = (minTempDiff + maxTempDiff) / 2;
 
-        const idealMinDiff = Math.abs(upcoming.apparentTemperatureMin - IDEAL_TEMP_MIN);
-        const idealMaxDiff = Math.abs(upcoming.apparentTemperatureMax - IDEAL_TEMP_MAX);
+        const idealMinDiff = Math.abs(forecastLow - IDEAL_TEMP_MIN);
+        const idealMaxDiff = Math.abs(forecastHigh - IDEAL_TEMP_MAX);
         const unpleasantness =
           Math.min(1, (idealMinDiff + idealMaxDiff) / (2 * LARGE_TEMPERATURE_DIFFERENCE));
 
