@@ -15,6 +15,7 @@ exports.register = (server, options, next) => {
   registerPartial('temperature-difference');
   registerPartial('umbrella-alert');
   registerPartial('nagbot');
+  registerPartial('temperature-trend');
 
   handlebars.registerHelper('percent', (number) => Math.floor(number * 100));
   handlebars.registerHelper('toTimeString', (time) => {
@@ -33,7 +34,6 @@ exports.register = (server, options, next) => {
   });
   handlebars.registerHelper('formatDate', (date) => date.toDateString());
   handlebars.registerHelper('round', (number) => Math.round(number));
-  handlebars.registerHelper('isPositive', (number) => number > 0);
   handlebars.registerHelper('isNegative', (number) => number < 0);
   handlebars.registerHelper('severityClass', (priority) => {
     if (priority >= 80) return 'high-priority';
@@ -52,6 +52,15 @@ exports.register = (server, options, next) => {
     }
 
     return date.toISOString();
+  });
+
+  // Temperature trend
+  handlebars.registerHelper('temperatureColor', (temperature) => {
+    return temperature > 0 ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 255)';
+  });
+
+  handlebars.registerHelper('add', (a, b) => {
+    return a + b;
   });
 
   server.route({

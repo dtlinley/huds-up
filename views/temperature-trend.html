@@ -1,0 +1,50 @@
+<div class="chart-container">
+    <canvas id="temperatures" width="200" height="150"></canvas>
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+  <script>
+  var ctx = document.getElementById("temperatures");
+  var precipitation = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [
+          {{#each data.temperatures}}
+          "{{toTimeString this.time}}",
+          {{/each}}
+        ],
+        datasets: [
+          {
+            label: 'Temperature (C)',
+            data: [
+              {{#each data.temperatures}}
+              {{temperature}},
+              {{/each}}
+            ],
+            borderColor: [
+                {{# each data.temperatures}}
+                "{{temperatureColor temperature}}",
+                {{/each}}
+            ],
+            backgroundColor: [
+                {{# each data.temperatures}}
+                "{{temperatureColor temperature}}",
+                {{/each}}
+            ],
+            fill: false,
+          }
+        ],
+      },
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+        yAxes: [{
+          ticks: {
+            suggestedMax: {{add data.maxTemp 2}},
+            suggestedMin: {{add data.minTemp -2}},
+          },
+        }],
+      },
+      },
+  });
+  </script>
+  

@@ -15,6 +15,7 @@ var precipitation = new Chart(ctx, {
       datasets: [
         {
           label: 'PoP (%)',
+          cubicInterpolationMode: 'monotone',
           data: [
             {{#each data.rain}}
             {{percentage}},
