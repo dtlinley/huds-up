@@ -1,10 +1,6 @@
 module.exports = {
-    "extends": "airbnb",
-    "installedESLint": true,
-    "plugins": [
-        "react"
-    ],
-    "rules": {
-      "strict": "off",
-    },
+  extends: 'airbnb-base',
+  rules: {
+    strict: 'off',
+  },
 };

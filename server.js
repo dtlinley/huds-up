@@ -2,10 +2,10 @@ const dotenv = require('dotenv');
 const inert = require('@hapi/inert');
 const handlebars = require('handlebars');
 const Hapi = require('@hapi/hapi');
-const views = require('./views/index.js');
 const vision = require('@hapi/vision');
 const wreck = require('@hapi/wreck');
 const fs = require('node:fs/promises');
+const views = require('./views/index.js');
 
 dotenv.config({ silent: true });
 const plugins = [];
@@ -16,9 +16,9 @@ const init = async () => {
     port,
     host: 'localhost',
   });
-  
+
   await server.start();
-  console.log(`Server running on %s`, server.info.uri);
+  console.log('Server running on %s', server.info.uri);
 
   server.register(vision);
   server.register(inert);
@@ -36,7 +36,7 @@ const init = async () => {
   });
 
   const pluginFiles = await fs.readdir('./plugins');
-  pluginFiles.forEach(file => {
+  pluginFiles.forEach((file) => {
     const name = file.replace(/\.js/g, '');
     plugins.push(name);
     const plugin = require(`./plugins/${name}`); // eslint-disable-line global-require
@@ -48,21 +48,17 @@ const init = async () => {
     path: '/plugins',
     handler: (request, reply) => {
       const promises = [];
-      plugins.forEach(plugin => {
+      plugins.forEach((plugin) => {
         promises.push(new Promise((resolve, reject) => {
-          wreck.get(`http://localhost:9010/plugins/${plugin}`).then((response) => {
-            return resolve(JSON.parse(response.payload));
-          });
+          wreck.get(`http://localhost:9010/plugins/${plugin}`).then((response) => resolve(JSON.parse(response.payload)));
         }));
       });
       return Promise.all(promises).then(
-        responses => 
-            responses
-            .reduce((acc, val) => acc.concat(val), [])
-            .filter(response => response.priority > 0)
-            .sort((a, b) => b.priority - a.priority)
-        ,
-        error => `Error encountered while loading plugins: ${error}`
+        (responses) => responses
+          .reduce((acc, val) => acc.concat(val), [])
+          .filter((response) => response.priority > 0)
+          .sort((a, b) => b.priority - a.priority),
+        (error) => `Error encountered while loading plugins: ${error}`,
       );
     },
   });

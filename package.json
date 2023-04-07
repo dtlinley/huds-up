@@ -24,18 +24,14 @@
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
     "handlebars": "^4.7.7",
-    "inert": "^4.2.1",
     "pg": "^8.10.0",
     "xml2json": "^0.12.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "eslint": "^2.10.2",
-    "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.16.0",
-    "eslint-plugin-jsx-a11y": "^1.5.5",
-    "eslint-plugin-react": "^5.2.2",
-    "mocha": "^8.2.0",
+    "eslint": "^8.37.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "mocha": "^10.2.0",
     "proxyquire": "^1.8.0",
     "sinon": "^7.5.0"
   }

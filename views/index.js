@@ -1,11 +1,11 @@
 const fs = require('fs');
 const handlebars = require('handlebars');
 
-const register = (server, options) => {
+const register = (server) => {
   const registerPartial = (partial) => {
     handlebars.registerPartial(
       partial,
-      fs.readFileSync(`views/${partial}.html`).toString()
+      fs.readFileSync(`views/${partial}.html`).toString(),
     );
   };
 
@@ -44,7 +44,7 @@ const register = (server, options) => {
     const date = new Date((new Date()).setHours(24, 0, 0, 0));
     if (interval.days) {
       return (new Date(date.setDate(date.getDate() + interval.days))).toISOString();
-    } else if (interval.months) {
+    } if (interval.months) {
       return (new Date(date.setMonth(date.getMonth() + interval.months))).toISOString();
     }
 
@@ -54,7 +54,7 @@ const register = (server, options) => {
   // Temperature trend
   handlebars.registerHelper(
     'temperatureColor',
-    temperature => (temperature > 0 ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 255)')
+    (temperature) => (temperature > 0 ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 255)'),
   );
 
   handlebars.registerHelper('add', (a, b) => a + b);
@@ -62,22 +62,16 @@ const register = (server, options) => {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, reply) => {
-      return server.inject('/plugins').then((response) => {
-        return reply.view('index', { plugins: response.result });
-      }, (err) => {
-        server.log(['error'], err);
-        return reply.view('index');
-      });
-    },
+    handler: (request, reply) => server.inject('/plugins').then((response) => reply.view('index', { plugins: response.result }), (err) => {
+      server.log(['error'], err);
+      return reply.view('index');
+    }),
   });
 
   server.route({
     method: 'GET',
     path: '/nag/new',
-    handler: (request, reply) => {
-      return reply.view('nagbot/new');
-    },
+    handler: (request, reply) => reply.view('nagbot/new'),
   });
 
   server.route({

@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 
@@ -9,7 +9,7 @@ describe('Server', () => {
   let server;
   let port;
 
-  beforeEach(done => {
+  beforeEach((done) => {
     port = process.env.PORT;
     process.env.PORT = 0;
     wreck = {
@@ -49,13 +49,13 @@ describe('Server', () => {
       './plugins/baz': bazPlugin,
     });
 
-    promise.then(srv => {
+    promise.then((srv) => {
       server = srv;
       done();
     });
   });
 
-  afterEach(done => {
+  afterEach((done) => {
     process.env.PORT = port;
     server.stop({}, done);
   });
@@ -76,23 +76,23 @@ describe('Server', () => {
         };
 
         getSpy = wreck.get.withArgs(sinon.match('/plugins/foo'))
-        .yields(undefined, undefined, JSON.stringify({ data: 'foo', priority: 3 }));
+          .yields(undefined, undefined, JSON.stringify({ data: 'foo', priority: 3 }));
 
         wreck.get.withArgs(sinon.match('/plugins/bar'))
-        .yields(undefined, undefined, JSON.stringify({ data: 'bar', priority: 1 }));
+          .yields(undefined, undefined, JSON.stringify({ data: 'bar', priority: 1 }));
 
         wreck.get.withArgs(sinon.match('/plugins/baz'))
-        .yields(undefined, undefined, JSON.stringify({ data: 'baz', priority: 2 }));
+          .yields(undefined, undefined, JSON.stringify({ data: 'baz', priority: 2 }));
       });
 
-      it('should respond with a 200 status code', done => {
-        server.inject(query).then(response => {
+      it('should respond with a 200 status code', (done) => {
+        server.inject(query).then((response) => {
           expect(response.statusCode).to.equal(200);
           done();
         });
       });
 
-      it('should fetch thumbnail data from each registered plugin', done => {
+      it('should fetch thumbnail data from each registered plugin', (done) => {
         server.inject(query).then(() => {
           expect(wreck.get.calledWith(sinon.match('/plugins/foo'))).to.be.true;
 
@@ -104,8 +104,8 @@ describe('Server', () => {
         });
       });
 
-      it('should reply with an array of all the plugin thumbnail data', done => {
-        server.inject(query).then(response => {
+      it('should reply with an array of all the plugin thumbnail data', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.length).to.equal(3);
           expect(response.result).to.contain({ data: 'foo', priority: 3 });
           expect(response.result).to.contain({ data: 'bar', priority: 1 });
@@ -114,8 +114,8 @@ describe('Server', () => {
         });
       });
 
-      it('should sort the data by priority (highest to lowest)', done => {
-        server.inject(query).then(response => {
+      it('should sort the data by priority (highest to lowest)', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result[0].priority).to.equal(3);
           expect(response.result[1].priority).to.equal(2);
           expect(response.result[2].priority).to.equal(1);
@@ -126,11 +126,11 @@ describe('Server', () => {
       describe('when a plugin responds with 0 priority', () => {
         beforeEach(() => {
           getSpy
-          .yields(undefined, undefined, JSON.stringify({ data: 'foo', priority: 0 }));
+            .yields(undefined, undefined, JSON.stringify({ data: 'foo', priority: 0 }));
         });
 
-        it('should filter out that response from the list', done => {
-          server.inject(query).then(response => {
+        it('should filter out that response from the list', (done) => {
+          server.inject(query).then((response) => {
             expect(response.result.length).to.equal(2);
             expect(response.result).to.contain({ data: 'bar', priority: 1 });
             expect(response.result).to.contain({ data: 'baz', priority: 2 });

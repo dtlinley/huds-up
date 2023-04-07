@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const Hapi = require('@hapi/hapi');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
@@ -13,7 +13,7 @@ describe('Umbrella Alert Plugin', () => {
   let cache;
   let data;
 
-  beforeEach(done => {
+  beforeEach((done) => {
     WEATHER_CITY_COORDS = process.env.WEATHER_CITY_COORDS;
     DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
     query = '/plugins/umbrella-alert';
@@ -39,7 +39,7 @@ describe('Umbrella Alert Plugin', () => {
     });
   });
 
-  afterEach(done => {
+  afterEach((done) => {
     process.env.WEATHER_CITY_COORDS = WEATHER_CITY_COORDS;
     process.env.DARKSKY_API_KEY = DARKSKY_API_KEY;
     server.stop({}, done);
@@ -56,8 +56,8 @@ describe('Umbrella Alert Plugin', () => {
         process.env.WEATHER_CITY_COORDS = '';
       });
 
-      it('should respond with a 0 priority message', done => {
-        server.inject(query).then(response => {
+      it('should respond with a 0 priority message', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.equal(0);
           done();
         });
@@ -74,8 +74,8 @@ describe('Umbrella Alert Plugin', () => {
         process.env.DARKSKY_API_KEY = '';
       });
 
-      it('should respond with a 0 priority message', done => {
-        server.inject(query).then(response => {
+      it('should respond with a 0 priority message', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.equal(0);
           done();
         });
@@ -92,7 +92,7 @@ describe('Umbrella Alert Plugin', () => {
         cache.get.returns(Promise.reject('foobar'));
         server.inject(query);
         expect(cache.get.calledWithMatch(
-          'https://api.darksky.net/forecast/foobarapikey/12,-34'
+          'https://api.darksky.net/forecast/foobarapikey/12,-34',
         )).to.be.true;
       });
     });
@@ -102,8 +102,8 @@ describe('Umbrella Alert Plugin', () => {
         cache.get.returns(Promise.reject('Uh oh, something went wrong'));
       });
 
-      it('should respond with a high priority message', done => {
-        server.inject(query).then(response => {
+      it('should respond with a high priority message', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.be.above(50);
           done();
         });
@@ -121,8 +121,8 @@ describe('Umbrella Alert Plugin', () => {
         cache.get.returns(Promise.resolve(data));
       });
 
-      it('should respond with the summary for today', done => {
-        server.inject(query).then(response => {
+      it('should respond with the summary for today', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.data.message).to.equal('Tut tut, it looks like precipitation');
           done();
         });
@@ -152,15 +152,15 @@ describe('Umbrella Alert Plugin', () => {
         cache.get.returns(Promise.resolve(data));
       });
 
-      it('should respond with a high priority message', done => {
-        server.inject(query).then(response => {
+      it('should respond with a high priority message', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.be.above(50);
           done();
         });
       });
 
-      it('should always be below 90, since rain is rarely life-threatening', done => {
-        server.inject(query).then(response => {
+      it('should always be below 90, since rain is rarely life-threatening', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.be.below(90);
           done();
         });
@@ -190,15 +190,15 @@ describe('Umbrella Alert Plugin', () => {
         cache.get.returns(Promise.resolve(data));
       });
 
-      it('should respond with a low priority message', done => {
-        server.inject(query).then(response => {
+      it('should respond with a low priority message', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.be.below(10);
           done();
         });
       });
 
-      it('should respond with a priority above zero, noting that no umbrella is needed', done => {
-        server.inject(query).then(response => {
+      it('should respond with a priority above zero, noting that no umbrella is needed', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.be.above(0);
           done();
         });
@@ -228,15 +228,15 @@ describe('Umbrella Alert Plugin', () => {
         cache.get.returns(Promise.resolve(data));
       });
 
-      it('should respond with a higher priority message than if rain isn\'t expected', done => {
-        server.inject(query).then(response => {
+      it('should respond with a higher priority message than if rain isn\'t expected', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.be.above(10);
           done();
         });
       });
 
-      it('should respond with a medium priority message', done => {
-        server.inject(query).then(response => {
+      it('should respond with a medium priority message', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.be.below(50);
           done();
         });
@@ -266,7 +266,7 @@ describe('Umbrella Alert Plugin', () => {
         cache.get.returns(Promise.resolve(data));
       });
 
-      it('should respond with a higher priority message than if no rain is expected soon, then lots of rain later', done => { // eslint-disable-line max-len
+      it('should respond with a higher priority message than if no rain is expected soon, then lots of rain later', (done) => { // eslint-disable-line max-len
         const altData = {
           hourly: {
             data: [
@@ -286,9 +286,9 @@ describe('Umbrella Alert Plugin', () => {
           },
         };
         cache.get.returns(Promise.resolve(altData));
-        server.inject(query).then(altResponse => {
+        server.inject(query).then((altResponse) => {
           cache.get.returns(Promise.resolve(data));
-          server.inject(query).then(response => {
+          server.inject(query).then((response) => {
             expect(response.result.priority).to.be.above(altResponse.result.priority);
             done();
           });

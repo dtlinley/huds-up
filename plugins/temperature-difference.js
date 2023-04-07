@@ -22,8 +22,8 @@
  * will be significantly less comfortable than today's, this will be the priority returned.
  */
 
-const cache = require('../cache.js');
 const parser = require('xml2json');
+const cache = require('../cache.js');
 
 const IDEAL_TEMP_MAX = 25;
 const IDEAL_TEMP_MIN = 20;
@@ -46,17 +46,19 @@ const register = (server, options) => {
         const forecasts = weatherData.forecastGroup.forecast;
         const averages = weatherData.forecastGroup.regionalNormals;
 
-        const averageHigh = parseInt(averages.temperature.find(t => t.class === 'high').$t, 10);
-        const averageLow = parseInt(averages.temperature.find(t => t.class === 'low').$t, 10);
+        const averageHigh = parseInt(averages.temperature.find((t) => t.class === 'high').$t, 10);
+        const averageLow = parseInt(averages.temperature.find((t) => t.class === 'low').$t, 10);
 
         const forecastHigh = parseInt(
-          forecasts.find(f => f.temperatures.temperature.class === 'high')
-            .temperatures.temperature.$t
-        , 10);
+          forecasts.find((f) => f.temperatures.temperature.class === 'high')
+            .temperatures.temperature.$t,
+          10,
+        );
         const forecastLow = parseInt(
-          forecasts.find(f => f.temperatures.temperature.class === 'low')
-            .temperatures.temperature.$t
-        , 10);
+          forecasts.find((f) => f.temperatures.temperature.class === 'low')
+            .temperatures.temperature.$t,
+          10,
+        );
 
         response.data.message = forecasts[0].textSummary;
         response.data.average = {
@@ -68,21 +70,18 @@ const register = (server, options) => {
           low: forecastLow,
         };
 
-        const minTempDiff =
-          forecastLow - averageLow;
-        const maxTempDiff =
-          forecastHigh - averageHigh;
+        const minTempDiff = forecastLow - averageLow;
+        const maxTempDiff = forecastHigh - averageHigh;
 
         const delta = Math.min(
           1,
-          (Math.abs(minTempDiff) + Math.abs(maxTempDiff)) / LARGE_TEMPERATURE_DIFFERENCE
+          (Math.abs(minTempDiff) + Math.abs(maxTempDiff)) / LARGE_TEMPERATURE_DIFFERENCE,
         );
         response.data.averageTemperatureDifference = (minTempDiff + maxTempDiff) / 2;
 
         const idealMinDiff = Math.abs(forecastLow - IDEAL_TEMP_MIN);
         const idealMaxDiff = Math.abs(forecastHigh - IDEAL_TEMP_MAX);
-        const unpleasantness =
-          Math.min(1, (idealMinDiff + idealMaxDiff) / (2 * LARGE_TEMPERATURE_DIFFERENCE));
+        const unpleasantness = Math.min(1, (idealMinDiff + idealMaxDiff) / (2 * LARGE_TEMPERATURE_DIFFERENCE));
 
         response.priority = Math.max(5, delta * unpleasantness * MAX_PRIORITY);
         return response;

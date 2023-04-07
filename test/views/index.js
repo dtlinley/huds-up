@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 
@@ -9,7 +9,7 @@ describe('Home page', () => {
   let wreck;
   let server;
 
-  beforeEach(done => {
+  beforeEach((done) => {
     port = process.env.PORT;
     process.env.PORT = 0;
     wreck = {
@@ -33,23 +33,23 @@ describe('Home page', () => {
       './plugins/disk-usage': diskUsage,
     });
     wreck.get.withArgs(sinon.match('/plugins/disk-usage'))
-    .yields(undefined, undefined, JSON.stringify({
-      data: {
-        filesystems: [
-          { mount: '/foo', capacity: 30 },
-        ],
-      },
-      priority: 1,
-      type: 'disk-usage',
-    }));
+      .yields(undefined, undefined, JSON.stringify({
+        data: {
+          filesystems: [
+            { mount: '/foo', capacity: 30 },
+          ],
+        },
+        priority: 1,
+        type: 'disk-usage',
+      }));
 
-    promise.then(srv => {
+    promise.then((srv) => {
       server = srv;
       done();
     });
   });
 
-  afterEach(done => {
+  afterEach((done) => {
     process.env.PORT = port;
     server.stop({}, done);
   });

@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const handlebars = require('handlebars');
 const Hapi = require('@hapi/hapi');
 const proxyquire = require('proxyquire').noCallThru();
@@ -12,7 +12,7 @@ describe('nagbot Plugin', () => {
   let server;
   let db;
 
-  beforeEach(done => {
+  beforeEach((done) => {
     server = new Hapi.Server();
     server.connection({});
 
@@ -45,7 +45,7 @@ describe('nagbot Plugin', () => {
     });
   });
 
-  afterEach(done => {
+  afterEach((done) => {
     server.stop({}, done);
   });
 
@@ -56,8 +56,8 @@ describe('nagbot Plugin', () => {
         db.getNags.returns(Promise.resolve([]));
       });
 
-      it('should return a priority 0 payload', done => {
-        server.inject(query).then(response => {
+      it('should return a priority 0 payload', (done) => {
+        server.inject(query).then((response) => {
           expect(response.result.priority).to.equal(0);
           done();
         });
@@ -70,10 +70,18 @@ describe('nagbot Plugin', () => {
 
       beforeEach(() => {
         db.getNags.returns(Promise.resolve([
-          { id: 1, name: 'Water the plants', interval: { days: 14 }, next: '2018-01-15T00:00:00Z' },
-          { id: 2, name: 'Wash towels', interval: { days: 7 }, next: '2018-01-08T00:00:00Z' },
-          { id: 3, name: 'Do this daily', interval: { days: 1 }, next: '2018-01-08T18:00:00Z' },
-          { id: 4, name: 'Overdue task', interval: { days: 21 }, next: '2018-01-01T18:00:00Z' },
+          {
+            id: 1, name: 'Water the plants', interval: { days: 14 }, next: '2018-01-15T00:00:00Z',
+          },
+          {
+            id: 2, name: 'Wash towels', interval: { days: 7 }, next: '2018-01-08T00:00:00Z',
+          },
+          {
+            id: 3, name: 'Do this daily', interval: { days: 1 }, next: '2018-01-08T18:00:00Z',
+          },
+          {
+            id: 4, name: 'Overdue task', interval: { days: 21 }, next: '2018-01-01T18:00:00Z',
+          },
         ]));
 
         fakeDate = new Date('2018-01-07T18:00:00Z');
@@ -84,63 +92,63 @@ describe('nagbot Plugin', () => {
         clock.restore();
       });
 
-      it('should return an array of plugin-response objects', done => {
-        server.inject(query).then(response => {
+      it('should return an array of plugin-response objects', (done) => {
+        server.inject(query).then((response) => {
           expect(Array.isArray(response.result)).to.be.true;
           expect(response.result.length).to.equal(4);
           done();
         });
       });
 
-      it('should have a high priority for nags that are almost due', done => {
-        server.inject(query).then(response => {
+      it('should have a high priority for nags that are almost due', (done) => {
+        server.inject(query).then((response) => {
           expect(
-            response.result.find(nag => nag.data.id === 2).priority
+            response.result.find((nag) => nag.data.id === 2).priority,
           ).to.be.greaterThan(50);
           done();
         });
       });
 
-      it('should have a low priority for nags that aren\'t due soon', done => {
-        server.inject(query).then(response => {
+      it('should have a low priority for nags that aren\'t due soon', (done) => {
+        server.inject(query).then((response) => {
           expect(
-            response.result.find(nag => nag.data.id === 1).priority
+            response.result.find((nag) => nag.data.id === 1).priority,
           ).to.be.lessThan(20);
           done();
         });
       });
 
-      it('should respond with the days until each nag is due', done => {
-        server.inject(query).then(response => {
+      it('should respond with the days until each nag is due', (done) => {
+        server.inject(query).then((response) => {
           expect(
-            response.result.find(nag => nag.data.id === 1).data.daysToNext
+            response.result.find((nag) => nag.data.id === 1).data.daysToNext,
           ).to.equal(7.25);
           done();
         });
       });
 
-      it('should respond with the name of each nag', done => {
-        server.inject(query).then(response => {
+      it('should respond with the name of each nag', (done) => {
+        server.inject(query).then((response) => {
           expect(
-            response.result.find(nag => nag.data.id === 1).data.name
+            response.result.find((nag) => nag.data.id === 1).data.name,
           ).to.equal('Water the plants');
           done();
         });
       });
 
-      it('should have a low priority for nags which have just been marked done', done => {
-        server.inject(query).then(response => {
+      it('should have a low priority for nags which have just been marked done', (done) => {
+        server.inject(query).then((response) => {
           expect(
-            response.result.find(nag => nag.data.id === 3).priority
+            response.result.find((nag) => nag.data.id === 3).priority,
           ).to.be.lessThan(10);
           done();
         });
       });
 
-      it('should not exceed the highest priority when a task is overdue', done => {
-        server.inject(query).then(response => {
+      it('should not exceed the highest priority when a task is overdue', (done) => {
+        server.inject(query).then((response) => {
           expect(
-            response.result.find(nag => nag.data.id === 4).priority
+            response.result.find((nag) => nag.data.id === 4).priority,
           ).to.be.lessThan(90);
           done();
         });
@@ -151,8 +159,8 @@ describe('nagbot Plugin', () => {
           db.getNags.returns(Promise.reject('test database error'));
         });
 
-        it('should respond with an error', done => {
-          server.inject(query).then(response => {
+        it('should respond with an error', (done) => {
+          server.inject(query).then((response) => {
             expect(response.result.data.message).to.equal('Could not fetch nags');
             done();
           });
@@ -173,15 +181,15 @@ describe('nagbot Plugin', () => {
       db.updateNag.returns(Promise.resolve());
     });
 
-    it('should update the `next` value of the given nag', done => {
+    it('should update the `next` value of the given nag', (done) => {
       server.inject(query).then(() => {
         expect(db.updateNag.calledWith(1, { next: '2018-01-22T23:59:59Z' })).to.be.ok;
         done();
       });
     });
 
-    it('should render a page indicating that the nag has been updated', done => {
-      server.inject(query).then(response => {
+    it('should render a page indicating that the nag has been updated', (done) => {
+      server.inject(query).then((response) => {
         expect(response.result).to.have.string('<body');
         expect(response.result).to.have.string('Nag updated');
         done();
@@ -193,7 +201,7 @@ describe('nagbot Plugin', () => {
         db.updateNag.rejects('database error');
       });
 
-      it('should render an error page', done => {
+      it('should render an error page', (done) => {
         server.inject(query).then((response) => {
           expect(response.result).to.have.string('<body');
           expect(response.result).to.have.string('could not be updated');
@@ -230,7 +238,7 @@ describe('nagbot Plugin', () => {
       });
     });
 
-    it('should render a page showing that the nag has been created', done => {
+    it('should render a page showing that the nag has been created', (done) => {
       server.inject(query).then((response) => {
         expect(response.result).to.have.string('<body');
         expect(response.result).to.have.string('Nag created');
@@ -244,7 +252,7 @@ describe('nagbot Plugin', () => {
         db.createNag.rejects('test database error');
       });
 
-      it('should render an error page', done => {
+      it('should render an error page', (done) => {
         server.inject(query).then((response) => {
           expect(response.result).to.have.string('<body');
           expect(response.result).to.have.string('test database error');

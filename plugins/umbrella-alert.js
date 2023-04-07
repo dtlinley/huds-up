@@ -1,8 +1,8 @@
 'use strict';
 
 // const wreck = require('wreck').defaults({ json: true });
-const cache = require('../cache.js');
 const parser = require('xml2json');
+const cache = require('../cache.js');
 
 // the number of forecasts to consider; users generally don't care about whether an umbrella is
 // needed more than 12 hours in the future
@@ -29,9 +29,8 @@ const register = (server, options) => {
           data: { message: forecasts[0].textSummary },
         };
 
-
         const precip = hourlyForecasts.map(
-          forecast => ({ percentage: forecast.lop.$t, time: forecast.dateTimeUTC })
+          (forecast) => ({ percentage: forecast.lop.$t, time: forecast.dateTimeUTC }),
         );
         response.data.rain = precip;
 
@@ -55,14 +54,13 @@ const register = (server, options) => {
         }
         return response;
       }).catch((err) => ({
-          priority: 60,
-          type: 'umbrella-alert',
-          data: {
-            error: err,
-            message: 'Could not fetch data',
-          },
-        })
-      );
+        priority: 60,
+        type: 'umbrella-alert',
+        data: {
+          error: err,
+          message: 'Could not fetch data',
+        },
+      }));
     },
   });
 };

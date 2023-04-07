@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 
@@ -27,23 +27,27 @@ describe('Database', () => {
     beforeEach(() => {
       pgClient.query.withArgs('SELECT * FROM nags').resolves({
         rows: [
-          { id: 1, name: 'Water the plants', interval: '2 weeks', next: '2018-01-15T00:00:00Z' },
-          { id: 2, name: 'Wash towels', interval: '1 weeks', next: '2018-01-08T00:00:00Z' },
+          {
+            id: 1, name: 'Water the plants', interval: '2 weeks', next: '2018-01-15T00:00:00Z',
+          },
+          {
+            id: 2, name: 'Wash towels', interval: '1 weeks', next: '2018-01-08T00:00:00Z',
+          },
         ],
       });
     });
 
-    it('should read from the nags table', done => {
+    it('should read from the nags table', (done) => {
       db.getNags().then(() => {
         expect(pgClient.query.calledWith(
-          'SELECT * FROM nags'
+          'SELECT * FROM nags',
         )).to.be.true;
         done();
       });
     });
 
-    it('should return a promise that resolves with all nags', done => {
-      db.getNags().then(nags => {
+    it('should return a promise that resolves with all nags', (done) => {
+      db.getNags().then((nags) => {
         expect(nags.length).to.equal(2);
         expect(nags[0].name).to.equal('Water the plants');
         done();
@@ -56,8 +60,8 @@ describe('Database', () => {
           .rejects(Error('test database error'));
       });
 
-      it('should reject with the error', done => {
-        db.getNags().catch(error => {
+      it('should reject with the error', (done) => {
+        db.getNags().catch((error) => {
           expect(error).to.equal('test database error');
           done();
         });
@@ -71,15 +75,15 @@ describe('Database', () => {
     beforeEach(() => {
       updatePayload = { next: '2018-01-01T00:00:00Z' };
       pgClient.query.resolves({
-        rows: [{ id: 123, name: 'Test nag', interval: '2 weeks', next: '2018-01-01T00:00:00Z' }],
+        rows: [{
+          id: 123, name: 'Test nag', interval: '2 weeks', next: '2018-01-01T00:00:00Z',
+        }],
       });
     });
 
-    it('should update the nag with the given ID', done => {
+    it('should update the nag with the given ID', (done) => {
       db.updateNag(123, updatePayload).then(() => {
-        expect(pgClient.query.calledWithMatch(
-          'WHERE id = $1', [123, '2018-01-01T00:00:00Z'])
-        ).to.be.ok;
+        expect(pgClient.query.calledWithMatch('WHERE id = $1', [123, '2018-01-01T00:00:00Z'])).to.be.ok;
         done();
       });
     });
@@ -92,11 +96,11 @@ describe('Database', () => {
     });
 
     describe('with only one property being updated', () => {
-      it('should update only that property of the nag', done => {
+      it('should update only that property of the nag', (done) => {
         db.updateNag(123, updatePayload).then(() => {
           expect(pgClient.query.calledWithMatch(
             'UPDATE nags SET next = $2',
-            [123, '2018-01-01T00:00:00Z']
+            [123, '2018-01-01T00:00:00Z'],
           )).to.be.ok;
           done();
         });
@@ -111,11 +115,11 @@ describe('Database', () => {
         };
       });
 
-      it('should update all properties of the given nag', done => {
+      it('should update all properties of the given nag', (done) => {
         db.updateNag(123, updatePayload).then(() => {
           expect(pgClient.query.calledWithMatch(
             'UPDATE nags SET name = $2,next = $3',
-            [123, 'foobar', '2018-01-01T00:00:00Z']
+            [123, 'foobar', '2018-01-01T00:00:00Z'],
           )).to.be.ok;
           done();
         });
@@ -146,19 +150,21 @@ describe('Database', () => {
         next: '2018-01-01T01:02:03Z',
       };
 
-      pgClient.query.resolves({ rows: [{
-        id: 1,
-        name: 'Test create nag',
-        interval: '1 months',
-        next: '2018-01-01T01:02:03Z',
-      }] });
+      pgClient.query.resolves({
+        rows: [{
+          id: 1,
+          name: 'Test create nag',
+          interval: '1 months',
+          next: '2018-01-01T01:02:03Z',
+        }],
+      });
     });
 
     it('should add a nag to the database', (done) => {
       db.createNag(createPayload).then(() => {
         expect(pgClient.query.calledWith(
           'INSERT INTO nags (name, interval, next) VALUES ($1, $2, $3) RETURNING *',
-          ['Test create nag', '1 months', '2018-01-01T01:02:03Z']
+          ['Test create nag', '1 months', '2018-01-01T01:02:03Z'],
         )).to.be.ok;
         done();
       });
@@ -218,9 +224,7 @@ describe('Database', () => {
 
     describe('when the database call fails', () => {
       beforeEach(() => {
-        pgClient.query.withArgs(
-          'DELETE FROM nags WHERE id = $1', [123]
-        ).rejects(Error('sample error'));
+        pgClient.query.withArgs('DELETE FROM nags WHERE id = $1', [123]).rejects(Error('sample error'));
       });
 
       it('should return a rejected promise', (done) => {

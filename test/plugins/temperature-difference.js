@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const Hapi = require('@hapi/hapi');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
@@ -155,9 +155,11 @@ describe('temperatureDifference Plugin', () => {
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayTime = Math.floor(yesterday.getTime() / 1000);
         priorStub = cache.get.withArgs(`https://api.darksky.net/forecast/foobarapikey/12,-34,${yesterdayTime}?units=ca`);
-        priorStub.returns(Promise.resolve({ daily: {
-          data: [{ apparentTemperatureMin: 15, apparentTemperatureMax: 25 }],
-        } }));
+        priorStub.returns(Promise.resolve({
+          daily: {
+            data: [{ apparentTemperatureMin: 15, apparentTemperatureMax: 25 }],
+          },
+        }));
 
         data.daily.data.push({ apparentTemperatureMin: 13, apparentTemperatureMax: 22 });
         data.daily.data.push({});
