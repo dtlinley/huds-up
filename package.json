@@ -11,7 +11,7 @@
     "test": "eslint . && NODE_ENV=test mocha --reporter dot --recursive test",
     "lint": "eslint .",
     "new-plugin": "node generator/add-plugin.js",
-    "debug": "node debug .",
+    "debug": "node inspect server.js",
     "test-debug": "NODE_ENV=test mocha debug --recursive test"
   },
   "author": "David Linley",
@@ -25,7 +25,7 @@
     "hapi-react": "^5.0.1",
     "inert": "^4.2.1",
     "node-df": "^0.1.4",
-    "pg": "^7.18.2",
+    "pg": "^8.10.0",
     "react": "^15.7.0",
     "react-dom": "^15.7.0",
     "vision": "^4.1.1",

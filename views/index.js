@@ -55,13 +55,12 @@ exports.register = (server, options, next) => {
   });
 
   // Temperature trend
-  handlebars.registerHelper('temperatureColor', (temperature) => {
-    return temperature > 0 ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 255)';
-  });
+  handlebars.registerHelper(
+    'temperatureColor',
+    temperature => (temperature > 0 ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 255)')
+  );
 
-  handlebars.registerHelper('add', (a, b) => {
-    return a + b;
-  });
+  handlebars.registerHelper('add', (a, b) => a + b);
 
   server.route({
     method: 'GET',
