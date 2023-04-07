@@ -17,17 +17,15 @@
   "author": "David Linley",
   "license": "ISC",
   "dependencies": {
+    "@hapi/hapi": "^21.3.1",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/vision": "^7.0.1",
+    "@hapi/wreck": "^18.0.1",
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
     "handlebars": "^4.7.7",
-    "hapi": "^16.7.0",
-    "hapi-react": "^5.0.1",
     "inert": "^4.2.1",
     "pg": "^8.10.0",
-    "react": "^15.7.0",
-    "react-dom": "^15.7.0",
-    "vision": "^4.1.1",
-    "wreck": "^10.0.0",
     "xml2json": "^0.12.0"
   },
   "devDependencies": {

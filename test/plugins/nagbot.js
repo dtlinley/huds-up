@@ -2,7 +2,7 @@
 
 const expect = require('chai').expect;
 const handlebars = require('handlebars');
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const vision = require('vision');

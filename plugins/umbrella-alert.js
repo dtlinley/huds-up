@@ -11,11 +11,11 @@ const DEPRESSION_FACTOR = 5; // if there's rain soon then later rain is less imp
 const INITIAL_IMPORTANCE = 50; // if it will rain heavily in the next hour, how important is that
 const HIGH_RAIN_THRESHOLD = 80; // what percent chance of rain is "a lot" of rain in 1 hour
 
-exports.register = (server, options, next) => {
+const register = (server, options) => {
   server.route({
     method: 'GET',
     path: '/plugins/umbrella-alert',
-    handler: (request, reply) => {
+    handler: (request, h) => {
       const stationId = process.env.WEATHER_STATION_ID;
       const url = `https://dd.weather.gc.ca/citypage_weather/xml/ON/${stationId}.xml`;
       return cache.get(url).then((payload) => {
@@ -53,24 +53,22 @@ exports.register = (server, options, next) => {
         } else {
           response.priority = priority;
         }
-        return reply(response);
-      }).catch((err) => {
-        reply({
+        return response;
+      }).catch((err) => ({
           priority: 60,
           type: 'umbrella-alert',
           data: {
             error: err,
             message: 'Could not fetch data',
           },
-        });
-      });
+        })
+      );
     },
   });
-
-  next();
 };
 
-exports.register.attributes = {
+exports.plugin = {
   name: 'umbrellaAlert',
   version: '0.0.1',
+  register,
 };

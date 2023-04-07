@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 

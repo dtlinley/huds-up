@@ -30,11 +30,11 @@ const IDEAL_TEMP_MIN = 20;
 const LARGE_TEMPERATURE_DIFFERENCE = 10;
 const MAX_PRIORITY = 80;
 
-exports.register = (server, options, next) => {
+const register = (server, options) => {
   server.route({
     method: 'GET',
     path: '/plugins/temperature-difference',
-    handler: (request, reply) => {
+    handler: (request, h) => {
       const response = { priority: 0, type: 'temperature-difference', data: {} };
 
       const stationId = process.env.WEATHER_STATION_ID;
@@ -85,8 +85,8 @@ exports.register = (server, options, next) => {
           Math.min(1, (idealMinDiff + idealMaxDiff) / (2 * LARGE_TEMPERATURE_DIFFERENCE));
 
         response.priority = Math.max(5, delta * unpleasantness * MAX_PRIORITY);
-        return reply(response);
-      }, (error) => reply({
+        return response;
+      }, (error) => ({
         priority: 60,
         type: 'temperature-difference',
         data: {
@@ -96,11 +96,10 @@ exports.register = (server, options, next) => {
       }));
     },
   });
-
-  next();
 };
 
-exports.register.attributes = {
+exports.plugin = {
   name: 'temperatureDifference',
   version: '0.0.1',
+  register,
 };

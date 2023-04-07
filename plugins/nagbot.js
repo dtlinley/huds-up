@@ -25,17 +25,17 @@ const proportionTimeLeft = (nextOccurence, interval) => {
   );
 };
 
-exports.register = (server, options, next) => {
+const register = (server, options) => {
   server.route({
     method: 'GET',
     path: '/plugins/nagbot',
-    handler: (request, reply) => {
-      db.getNags().then(nags => {
+    handler: (request, h) => {
+      return db.getNags().then(nags => {
         if (!nags || !nags.length) {
-          return reply({ priority: 0, type: 'nagbot', message: 'No nags found' });
+          return { priority: 0, type: 'nagbot', message: 'No nags found' };
         }
 
-        return reply(nags.map(nag => {
+        return nags.map(nag => {
           const nextOccurence = new Date(nag.next);
           const now = new Date();
 
@@ -58,17 +58,17 @@ exports.register = (server, options, next) => {
               next: nag.next,
             },
           };
-        }));
+        });
       }, error => {
         server.log(['error'], error.stack);
-        reply({
+        return {
           priority: 60,
           type: 'nagbot',
           data: {
             error,
             message: 'Could not fetch nags',
           },
-        });
+        };
       });
     },
   });
@@ -78,12 +78,12 @@ exports.register = (server, options, next) => {
   server.route({
     method: 'POST',
     path: '/plugins/nagbot/formapi/nags/{id}',
-    handler: (request, reply) => {
-      db.updateNag(parseInt(request.params.id, 10), request.payload)
+    handler: (request, h) => {
+      return db.updateNag(parseInt(request.params.id, 10), request.payload)
       .then(() => {
-        reply.view('nagbot/formapi-update');
+        h.view('nagbot/formapi-update');
       }, (error) => {
-        reply.view('nagbot/formapi-error', { operationType: 'updated', error });
+        h.view('nagbot/formapi-error', { operationType: 'updated', error });
       });
     },
   });
@@ -91,30 +91,27 @@ exports.register = (server, options, next) => {
   server.route({
     method: 'PUT',
     path: '/plugins/nagbot/nags/{id}',
-    handler: (request, reply) => {
+    handler: (request, h) => {
       const id = parseInt(request.params.id, 10);
-      db.updateNag(id, request.payload)
-      .then((nag) => reply(nag))
-      .catch((error) =>
-        reply({ data: { error, message: 'Update failed. Please try again later.' } })
-      );
+      return db.updateNag(id, request.payload)
+      .catch((error) => ({ data: { error, message: 'Update failed. Please try again later.' } }));
     },
   });
 
   server.route({
     method: 'POST',
     path: '/plugins/nagbot/formapi/nags',
-    handler: (request, reply) => {
+    handler: (request, h) => {
       const nag = {
         name: request.payload.name,
         next: request.payload.next,
         interval:
           `${request.payload.intervalCount} ${request.payload.intervalLength}`,
       };
-      db.createNag(nag).then(() => {
-        reply.view('nagbot/formapi-create', { nag });
+      return db.createNag(nag).then(() => {
+        h.view('nagbot/formapi-create', { nag });
       }, error => {
-        reply.view('nagbot/formapi-error', { operationType: 'created', error });
+        h.view('nagbot/formapi-error', { operationType: 'created', error });
       });
     },
   });
@@ -122,37 +119,33 @@ exports.register = (server, options, next) => {
   server.route({
     method: 'POST',
     path: '/plugins/nagbot/nags',
-    handler: (request, reply) => {
+    handler: (request, h) => {
       const nag = {
         name: request.payload.name,
         next: request.payload.next,
         interval:
           `${request.payload.intervalCount} ${request.payload.intervalLength}`,
       };
-      db.createNag(nag)
-      .then((newNag) => reply(newNag))
-      .catch(error => {
-        reply({ data: { error, message: 'Failed to create nag. Please try again later.' } });
-      });
+      return db.createNag(nag)
+      .catch(error => ({ data: { error, message: 'Failed to create nag. Please try again later.' } }));
     },
   });
 
   server.route({
     method: 'POST',
     path: '/plugins/nagbot/formapi/nags/{id}/delete',
-    handler: (request, reply) => {
-      db.deleteNag(parseInt(request.params.id, 10))
-      .then(() => reply.view('nagbot/formapi-delete'))
+    handler: (request, h) => {
+      return db.deleteNag(parseInt(request.params.id, 10))
+      .then(() => h.view('nagbot/formapi-delete'))
       .catch((error) =>
-        reply.view('nagbot/formapi-error', { operationType: 'deleted', error })
+        h.view('nagbot/formapi-error', { operationType: 'deleted', error })
       );
     },
   });
-
-  next();
 };
 
-exports.register.attributes = {
+exports.plugin = {
   name: 'nagbot',
   version: '0.0.1',
+  register,
 };

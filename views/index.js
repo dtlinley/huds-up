@@ -1,7 +1,7 @@
 const fs = require('fs');
 const handlebars = require('handlebars');
 
-exports.register = (server, options, next) => {
+const register = (server, options) => {
   const registerPartial = (partial) => {
     handlebars.registerPartial(
       partial,
@@ -9,9 +9,6 @@ exports.register = (server, options, next) => {
     );
   };
 
-  registerPartial('ttc-alert');
-  registerPartial('disk-usage');
-  registerPartial('backup-backintime');
   registerPartial('temperature-difference');
   registerPartial('umbrella-alert');
   registerPartial('nagbot');
@@ -66,11 +63,11 @@ exports.register = (server, options, next) => {
     method: 'GET',
     path: '/',
     handler: (request, reply) => {
-      server.inject('/plugins').then((response) => {
-        reply.view('index', { plugins: response.result });
+      return server.inject('/plugins').then((response) => {
+        return reply.view('index', { plugins: response.result });
       }, (err) => {
         server.log(['error'], err);
-        reply.view('index');
+        return reply.view('index');
       });
     },
   });
@@ -79,7 +76,7 @@ exports.register = (server, options, next) => {
     method: 'GET',
     path: '/nag/new',
     handler: (request, reply) => {
-      reply.view('nagbot/new');
+      return reply.view('nagbot/new');
     },
   });
 
@@ -92,11 +89,10 @@ exports.register = (server, options, next) => {
       },
     },
   });
-
-  next();
 };
 
-exports.register.attributes = {
+exports.plugin = {
   name: 'hudsUpViews',
   version: '0.0.1',
+  register,
 };
