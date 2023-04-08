@@ -1,7 +1,7 @@
 <div class="chart-container">
   <canvas id="precipitation" width="200" height="150"></canvas>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
 <script>
 var ctx = document.getElementById("precipitation");
 var precipitation = new Chart(ctx, {
@@ -28,13 +28,17 @@ var precipitation = new Chart(ctx, {
       ],
     },
     options: {
+      pointRadius: 0,
       maintainAspectRatio: false,
       scales: {
-        yAxes: [{
-          ticks: {
-            suggestedMax: 100,
-          },
-        }],
+        y: {
+          max: 100,
+        },
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
       },
     },
 });
