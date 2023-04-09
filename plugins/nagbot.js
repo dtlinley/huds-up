@@ -78,9 +78,9 @@ const register = (server, options) => {
     path: '/plugins/nagbot/formapi/nags/{id}',
     handler: (request, h) => db.updateNag(parseInt(request.params.id, 10), request.payload)
       .then(() => {
-        h.view('nagbot/formapi-update');
+        return h.view('nagbot/formapi-update');
       }, (error) => {
-        h.view('nagbot/formapi-error', { operationType: 'updated', error });
+        return h.view('nagbot/formapi-error', { operationType: 'updated', error });
       }),
   });
 
@@ -105,9 +105,9 @@ const register = (server, options) => {
           `${request.payload.intervalCount} ${request.payload.intervalLength}`,
       };
       return db.createNag(nag).then(() => {
-        h.view('nagbot/formapi-create', { nag });
+        return h.view('nagbot/formapi-create', { nag });
       }, (error) => {
-        h.view('nagbot/formapi-error', { operationType: 'created', error });
+        return h.view('nagbot/formapi-error', { operationType: 'created', error });
       });
     },
   });

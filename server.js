@@ -62,12 +62,6 @@ const init = async () => {
       );
     },
   });
-
-  // server.events.on('request-internal', (request) => {
-  //   if (process.env.NODE_ENV !== 'test') {
-  //     server.log(['info'], `#${request.method} ${request.path}`);
-  //   }
-  // });
 };
 
 init();
