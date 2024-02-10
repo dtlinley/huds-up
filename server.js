@@ -5,7 +5,7 @@ const Hapi = require('@hapi/hapi');
 const vision = require('@hapi/vision');
 const wreck = require('@hapi/wreck');
 const fs = require('node:fs/promises');
-const views = require('./views/index.js');
+const views = require('./views/index');
 
 dotenv.config({ silent: true });
 const plugins = [];
@@ -18,7 +18,7 @@ const init = async () => {
   });
 
   await server.start();
-  console.log('Server running on %s', server.info.uri);
+  console.log('Server running on %s', server.info.uri); // eslint-disable-line no-console
 
   server.register(vision);
   server.register(inert);
@@ -39,17 +39,17 @@ const init = async () => {
   pluginFiles.forEach((file) => {
     const name = file.replace(/\.js/g, '');
     plugins.push(name);
-    const plugin = require(`./plugins/${name}`); // eslint-disable-line global-require
+    const plugin = require(`./plugins/${name}`); // eslint-disable-line global-require, import/no-dynamic-require
     server.register(plugin.plugin);
   });
 
   server.route({
     method: 'GET',
     path: '/plugins',
-    handler: (request, reply) => {
+    handler: () => {
       const promises = [];
       plugins.forEach((plugin) => {
-        promises.push(new Promise((resolve, reject) => {
+        promises.push(new Promise((resolve) => {
           wreck.get(`http://localhost:9010/plugins/${plugin}`).then((response) => resolve(JSON.parse(response.payload)));
         }));
       });

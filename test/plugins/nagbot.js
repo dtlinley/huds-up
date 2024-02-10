@@ -5,7 +5,6 @@ const handlebars = require('handlebars');
 const Hapi = require('@hapi/hapi');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
-const vision = require('vision');
 
 describe('nagbot Plugin', () => {
   let query;
@@ -32,7 +31,7 @@ describe('nagbot Plugin', () => {
         '../db.js': db,
       });
 
-      server.register([plugin, vision]).then(() => {
+      server.register([plugin]).then(() => {
         server.views({
           engines: { html: handlebars },
           path: `${__dirname}/../../views`,
@@ -156,7 +155,7 @@ describe('nagbot Plugin', () => {
 
       describe('when the database call fails', () => {
         beforeEach(() => {
-          db.getNags.returns(Promise.reject('test database error'));
+          db.getNags.returns(Promise.reject(Error('test database error')));
         });
 
         it('should respond with an error', (done) => {
