@@ -89,7 +89,7 @@ describe('Umbrella Alert Plugin', () => {
 
     describe('fetching rain data', () => {
       it('should make an API call to the weather service', () => {
-        cache.get.returns(Promise.reject('foobar'));
+        cache.get.returns(Promise.reject(Error('foobar')));
         server.inject(query);
         expect(cache.get.calledWithMatch(
           'https://api.darksky.net/forecast/foobarapikey/12,-34',
@@ -99,7 +99,7 @@ describe('Umbrella Alert Plugin', () => {
 
     describe('when the API call fails', () => {
       beforeEach(() => {
-        cache.get.returns(Promise.reject('Uh oh, something went wrong'));
+        cache.get.returns(Promise.reject(Error('Uh oh, something went wrong')));
       });
 
       it('should respond with a high priority message', (done) => {

@@ -19,9 +19,9 @@ module.exports = {
       wreck.get(url, { headers }).then((response) => {
         if (response.res.statusCode !== 200) {
           console.log(`${url} returned non-200 status code ${res.statusCode}`); // eslint-disable-line
-          return reject(`${res.statusCode} - ${res.statusMessage}`);
+          return reject(Error(`${response.res.statusCode} - ${response.res.statusMessage}`));
         }
-  
+
         console.log(`${url} loaded and cached`); // eslint-disable-line no-console
         return resolve(response.payload);
       });

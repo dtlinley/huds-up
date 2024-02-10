@@ -23,18 +23,18 @@
  */
 
 const parser = require('xml2json');
-const cache = require('../cache.js');
+const cache = require('../cache');
 
 const IDEAL_TEMP_MAX = 25;
 const IDEAL_TEMP_MIN = 20;
 const LARGE_TEMPERATURE_DIFFERENCE = 10;
 const MAX_PRIORITY = 80;
 
-const register = (server, options) => {
+const register = (server) => {
   server.route({
     method: 'GET',
     path: '/plugins/temperature-difference',
-    handler: (request, h) => {
+    handler: () => {
       const response = { priority: 0, type: 'temperature-difference', data: {} };
 
       const stationId = process.env.WEATHER_STATION_ID;
@@ -43,22 +43,32 @@ const register = (server, options) => {
       return cache.get(url).then((payload) => {
         const json = parser.toJson(payload, { object: true });
         const weatherData = json.siteData;
+        const hourlyForecasts = weatherData.hourlyForecastGroup.hourlyForecast;
         const forecasts = weatherData.forecastGroup.forecast;
         const averages = weatherData.forecastGroup.regionalNormals;
 
         const averageHigh = parseInt(averages.temperature.find((t) => t.class === 'high').$t, 10);
         const averageLow = parseInt(averages.temperature.find((t) => t.class === 'low').$t, 10);
 
-        const forecastHigh = parseInt(
-          forecasts.find((f) => f.temperatures.temperature.class === 'high')
-            .temperatures.temperature.$t,
-          10,
-        );
-        const forecastLow = parseInt(
-          forecasts.find((f) => f.temperatures.temperature.class === 'low')
-            .temperatures.temperature.$t,
-          10,
-        );
+        let forecastLow = NaN;
+        let forecastHigh = NaN;
+        hourlyForecasts.forEach((forecast) => {
+          let temperature = forecast.temperature.$t;
+          if (forecast.windChill.$t) {
+            temperature = forecast.windChill.$t;
+          } else if (forecast.humidex.$t) {
+            temperature = forecast.humidex.$t;
+          }
+          temperature = parseInt(temperature, 10);
+
+          if (Number.isNaN(forecastLow) || temperature < forecastLow) {
+            forecastLow = temperature;
+          }
+
+          if (Number.isNaN(forecastHigh) || temperature > forecastHigh) {
+            forecastHigh = temperature;
+          }
+        });
 
         response.data.message = forecasts[0].textSummary;
         response.data.average = {
@@ -81,7 +91,8 @@ const register = (server, options) => {
 
         const idealMinDiff = Math.abs(forecastLow - IDEAL_TEMP_MIN);
         const idealMaxDiff = Math.abs(forecastHigh - IDEAL_TEMP_MAX);
-        const unpleasantness = Math.min(1, (idealMinDiff + idealMaxDiff) / (2 * LARGE_TEMPERATURE_DIFFERENCE));
+        const unpleasantness = Math.min(1, (idealMinDiff + idealMaxDiff)
+          / (2 * LARGE_TEMPERATURE_DIFFERENCE));
 
         response.priority = Math.max(5, delta * unpleasantness * MAX_PRIORITY);
         return response;

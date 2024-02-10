@@ -2,7 +2,7 @@
 
 // const wreck = require('wreck').defaults({ json: true });
 const parser = require('xml2json');
-const cache = require('../cache.js');
+const cache = require('../cache');
 
 // the number of forecasts to consider; users generally don't care about whether an umbrella is
 // needed more than 12 hours in the future
@@ -11,11 +11,11 @@ const DEPRESSION_FACTOR = 5; // if there's rain soon then later rain is less imp
 const INITIAL_IMPORTANCE = 50; // if it will rain heavily in the next hour, how important is that
 const HIGH_RAIN_THRESHOLD = 80; // what percent chance of rain is "a lot" of rain in 1 hour
 
-const register = (server, options) => {
+const register = (server) => {
   server.route({
     method: 'GET',
     path: '/plugins/umbrella-alert',
-    handler: (request, h) => {
+    handler: () => {
       const stationId = process.env.WEATHER_STATION_ID;
       const url = `https://dd.weather.gc.ca/citypage_weather/xml/ON/${stationId}.xml`;
       return cache.get(url).then((payload) => {

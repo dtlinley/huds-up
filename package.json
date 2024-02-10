@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "eslint . && NODE_ENV=test mocha --reporter dot --recursive test",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "new-plugin": "node generator/add-plugin.js",
     "debug": "node inspect server.js",
     "test-debug": "NODE_ENV=test mocha debug --recursive test"

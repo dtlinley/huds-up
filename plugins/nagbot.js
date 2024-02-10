@@ -1,6 +1,6 @@
 'use strict';
 
-const db = require('../db.js');
+const db = require('../db');
 
 const MS_IN_DAY = 86400000;
 const MAX_PRIORITY = 85;
@@ -25,11 +25,11 @@ const proportionTimeLeft = (nextOccurence, interval) => {
   );
 };
 
-const register = (server, options) => {
+const register = (server) => {
   server.route({
     method: 'GET',
     path: '/plugins/nagbot',
-    handler: (request, h) => db.getNags().then((nags) => {
+    handler: () => db.getNags().then((nags) => {
       if (!nags || !nags.length) {
         return { priority: 0, type: 'nagbot', message: 'No nags found' };
       }
@@ -44,7 +44,7 @@ const register = (server, options) => {
           daysToNext + 1,
         );
         const proportionLeft = proportionTimeLeft(nextOccurence, nag.interval);
-        const priority = MAX_PRIORITY * (1 - proportionLeft) / (DAMPENING_FACTOR * adjustedDays);
+        const priority = (MAX_PRIORITY * (1 - proportionLeft)) / (DAMPENING_FACTOR * adjustedDays);
 
         return {
           priority,
@@ -77,17 +77,13 @@ const register = (server, options) => {
     method: 'POST',
     path: '/plugins/nagbot/formapi/nags/{id}',
     handler: (request, h) => db.updateNag(parseInt(request.params.id, 10), request.payload)
-      .then(() => {
-        return h.view('nagbot/formapi-update');
-      }, (error) => {
-        return h.view('nagbot/formapi-error', { operationType: 'updated', error });
-      }),
+      .then(() => h.view('nagbot/formapi-update'), (error) => h.view('nagbot/formapi-error', { operationType: 'updated', error })),
   });
 
   server.route({
     method: 'PUT',
     path: '/plugins/nagbot/nags/{id}',
-    handler: (request, h) => {
+    handler: (request) => {
       const id = parseInt(request.params.id, 10);
       return db.updateNag(id, request.payload)
         .catch((error) => ({ data: { error, message: 'Update failed. Please try again later.' } }));
@@ -104,18 +100,14 @@ const register = (server, options) => {
         interval:
           `${request.payload.intervalCount} ${request.payload.intervalLength}`,
       };
-      return db.createNag(nag).then(() => {
-        return h.view('nagbot/formapi-create', { nag });
-      }, (error) => {
-        return h.view('nagbot/formapi-error', { operationType: 'created', error });
-      });
+      return db.createNag(nag).then(() => h.view('nagbot/formapi-create', { nag }), (error) => h.view('nagbot/formapi-error', { operationType: 'created', error }));
     },
   });
 
   server.route({
     method: 'POST',
     path: '/plugins/nagbot/nags',
-    handler: (request, h) => {
+    handler: (request) => {
       const nag = {
         name: request.payload.name,
         next: request.payload.next,

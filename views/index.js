@@ -54,7 +54,22 @@ const register = (server) => {
   // Temperature trend
   handlebars.registerHelper(
     'temperatureColor',
-    (temperature) => (temperature > 0 ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 255)'),
+    (temperature) => {
+      const tooHot = '#ff0000';
+      const tempBreakpoints = {
+        '-20': '#6100ff',
+        '-10': '#00b2ff',
+        0: '#00ffff',
+        10: '#62ff00',
+        20: '#dea800',
+        30: '#f87100',
+        50: '#ff1d00',
+      };
+
+      const nextHighestTemperatureColor = Math.ceil(temperature / 10) * 10;
+
+      return tempBreakpoints[nextHighestTemperatureColor] || tooHot;
+    },
   );
 
   handlebars.registerHelper('add', (a, b) => a + b);
