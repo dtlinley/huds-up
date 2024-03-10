@@ -45,10 +45,10 @@ const register = (server) => {
         const weatherData = json.siteData;
         const hourlyForecasts = weatherData.hourlyForecastGroup.hourlyForecast;
         const forecasts = weatherData.forecastGroup.forecast;
-        const averages = weatherData.forecastGroup.regionalNormals;
+        const yesterday = weatherData.yesterdayConditions;
 
-        const averageHigh = parseInt(averages.temperature.find((t) => t.class === 'high').$t, 10);
-        const averageLow = parseInt(averages.temperature.find((t) => t.class === 'low').$t, 10);
+        const yesterdayHigh = parseInt(yesterday.temperature.find((t) => t.class === 'high').$t, 10);
+        const yesterdayLow = parseInt(yesterday.temperature.find((t) => t.class === 'low').$t, 10);
 
         let forecastLow = NaN;
         let forecastHigh = NaN;
@@ -71,17 +71,17 @@ const register = (server) => {
         });
 
         response.data.message = forecasts[0].textSummary;
-        response.data.average = {
-          high: averageHigh,
-          low: averageLow,
+        response.data.yesterday = {
+          high: yesterdayHigh,
+          low: yesterdayLow,
         };
         response.data.forecast = {
           high: forecastHigh,
           low: forecastLow,
         };
 
-        const minTempDiff = forecastLow - averageLow;
-        const maxTempDiff = forecastHigh - averageHigh;
+        const minTempDiff = forecastLow - yesterdayLow;
+        const maxTempDiff = forecastHigh - yesterdayHigh;
 
         const delta = Math.min(
           1,
