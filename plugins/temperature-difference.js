@@ -53,13 +53,7 @@ const register = (server) => {
         let forecastLow = NaN;
         let forecastHigh = NaN;
         hourlyForecasts.forEach((forecast) => {
-          let temperature = forecast.temperature.$t;
-          if (forecast.windChill.$t) {
-            temperature = forecast.windChill.$t;
-          } else if (forecast.humidex.$t) {
-            temperature = forecast.humidex.$t;
-          }
-          temperature = parseInt(temperature, 10);
+          const temperature = parseInt(forecast.temperature.$t, 10);
 
           if (Number.isNaN(forecastLow) || temperature < forecastLow) {
             forecastLow = temperature;
