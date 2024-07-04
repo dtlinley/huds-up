@@ -14,3 +14,14 @@
 .nag-buttons button {
   width: 95%;
 }
+
+.nag-buttons-danger {
+  padding-top: 40px;
+}
+
+.nag-buttons-danger button {
+  color: white;
+  background-color: red;
+  border-radius: 5px;
+  border: 1px black solid;
+}

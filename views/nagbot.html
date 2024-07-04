@@ -32,7 +32,16 @@
     <input type="hidden" name="next" value="{{todayPlusInterval data.interval}}">
     <button type="submit">Mark as done</button>
   </form>
-
+  <form action="/plugins/nagbot/formapi/nags/{{data.id}}" method="post" class="nag-button-secondary">
+    <input type="hidden" name="next" value="{{tomorrow}}">
+    <button type="submit">I'll do it tomorrow</button>
+  </form>
+  <form action="/plugins/nagbot/formapi/nags/{{data.id}}" method="post" class="nag-button-secondary">
+    <input type="hidden" name="next" value="{{weekend}}">
+    <button type="submit">I'll do it on the weekend</button>
+  </form>
+</section>
+<section class="nag-buttons-danger">
   <form action="/plugins/nagbot/formapi/nags/{{data.id}}/delete" method="post" class="nag-button-secondary">
     <button type="submit" class="danger">Delete</button>
   </form>

@@ -41,7 +41,7 @@ const register = (server) => {
 
   // Nagbot
   handlebars.registerHelper('todayPlusInterval', (interval) => {
-    const date = new Date((new Date()).setHours(24, 0, 0, 0));
+    const date = new Date((new Date()).setHours(12, 0, 0, 0));
     if (interval.days) {
       return (new Date(date.setDate(date.getDate() + interval.days))).toISOString();
     } if (interval.months) {
@@ -49,6 +49,17 @@ const register = (server) => {
     }
 
     return date.toISOString();
+  });
+
+  handlebars.registerHelper('tomorrow', () => {
+    const date = new Date((new Date()).setHours(12, 0, 0, 0));
+    return (new Date(date.setDate(date.getDate() + 1))).toISOString();
+  });
+
+  handlebars.registerHelper('weekend', () => {
+    const date = new Date((new Date()).setHours(12, 0, 0, 0));
+    const dayOfWeek = date.getDay() // Sunday 0, Saturday 6
+    return (new Date(date.setDate(date.getDate() + (6 - dayOfWeek)))).toISOString();
   });
 
   // Temperature trend
