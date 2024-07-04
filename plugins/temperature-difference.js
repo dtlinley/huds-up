@@ -47,6 +47,10 @@ const register = (server) => {
         const forecasts = weatherData.forecastGroup.forecast;
         const yesterday = weatherData.yesterdayConditions;
 
+        if (!yesterday) {
+          return response;
+        }
+
         const yesterdayHigh = parseInt(yesterday.temperature.find((t) => t.class === 'high').$t, 10);
         const yesterdayLow = parseInt(yesterday.temperature.find((t) => t.class === 'low').$t, 10);
 
