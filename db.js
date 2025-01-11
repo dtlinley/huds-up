@@ -38,4 +38,8 @@ module.exports = {
   deleteNag: (id) => clientPromise.then(() => client.query('DELETE FROM nags WHERE id = $1', [id])
     .then(() => Promise.resolve())
     .catch((exception) => Promise.reject(exception.message))),
+
+  upsertTemperature: (low, high) => clientPromise.then(() => {
+    const now = DateTime.now()
+  }),
 };

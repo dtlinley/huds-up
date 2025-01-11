@@ -41,7 +41,7 @@ const register = (server) => {
         },
       };
 
-      const temps = hourlyForecasts.map(
+      const feelsLikeTemps = hourlyForecasts.map(
         (forecast) => {
           const tempReading = {
             temperature: forecast.temperature.$t,
@@ -56,8 +56,21 @@ const register = (server) => {
           return tempReading;
         },
       );
-      response.data.temperatures = temps;
-      response.data.currentTemp = temps[0].temperature;
+      response.data.feelsLikeTemps = feelsLikeTemps;
+
+      const realTemps = hourlyForecasts.map(
+        (forecast) => {
+          const tempReading = {
+            temperature: forecast.temperature.$t,
+            time: forecast.dateTimeUTC,
+          };
+          tempReading.temperature = parseInt(tempReading.temperature, 10);
+          return tempReading;
+        },
+      );
+      response.data.realTemps = realTemps;
+
+      response.data.currentTemp = realTemps[0].temperature;
 
       const idealMinDiff = Math.abs(forecastLow - IDEAL_TEMP_MIN);
       const idealMaxDiff = Math.abs(forecastHigh - IDEAL_TEMP_MAX);

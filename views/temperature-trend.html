@@ -8,7 +8,7 @@
       type: 'line',
       data: {
         labels: [
-          {{#each data.temperatures}}
+          {{#each data.realTemps}}
           "{{toTimeString this.time}}",
           {{/each}}
         ],
@@ -16,17 +16,36 @@
           {
             label: 'Temperature (C)',
             data: [
-              {{#each data.temperatures}}
+              {{#each data.realTemps}}
               {{temperature}},
               {{/each}}
             ],
             borderColor: [
-                {{# each data.temperatures}}
+                {{# each data.realTemps}}
                 "{{temperatureColor temperature}}",
                 {{/each}}
             ],
             backgroundColor: [
-                {{# each data.temperatures}}
+                {{# each data.realTemps}}
+                "{{temperatureColor temperature}}",
+                {{/each}}
+            ],
+            fill: false,
+          },
+          {
+            label: 'Feels Like (C)',
+            data: [
+              {{#each data.feelsLikeTemps}}
+              {{temperature}},
+              {{/each}}
+            ],
+            borderColor: [
+                {{# each data.feelsLikeTemps}}
+                "{{temperatureColor temperature}}",
+                {{/each}}
+            ],
+            backgroundColor: [
+                {{# each data.feelsLikeTemps}}
                 "{{temperatureColor temperature}}",
                 {{/each}}
             ],
@@ -47,4 +66,3 @@
       },
   });
   </script>
-  
