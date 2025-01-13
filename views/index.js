@@ -41,6 +41,9 @@ const register = (server) => {
 
   // Nagbot
   handlebars.registerHelper('todayPlusInterval', (interval) => {
+    if (!interval) {
+      return '';
+    }
     const date = new Date((new Date()).setHours(12, 0, 0, 0));
     if (interval.days) {
       return (new Date(date.setDate(date.getDate() + interval.days))).toISOString();

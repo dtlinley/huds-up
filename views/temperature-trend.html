@@ -13,6 +13,21 @@
           {{/each}}
         ],
         datasets: [
+        {
+            label: 'Feels Like (C)',
+            data: [
+              {{#each data.feelsLikeTemps}}
+              {{temperature}},
+              {{/each}}
+            ],
+            borderColor: "{{temperatureColor data.currentTemp}}",
+            backgroundColor: [
+                {{# each data.feelsLikeTemps}}
+                "{{temperatureColor temperature}}",
+                {{/each}}
+            ],
+            fill: false,
+          },
           {
             label: 'Temperature (C)',
             data: [
@@ -20,35 +35,8 @@
               {{temperature}},
               {{/each}}
             ],
-            borderColor: [
-                {{# each data.realTemps}}
-                "{{temperatureColor temperature}}",
-                {{/each}}
-            ],
-            backgroundColor: [
-                {{# each data.realTemps}}
-                "{{temperatureColor temperature}}",
-                {{/each}}
-            ],
-            fill: false,
-          },
-          {
-            label: 'Feels Like (C)',
-            data: [
-              {{#each data.feelsLikeTemps}}
-              {{temperature}},
-              {{/each}}
-            ],
-            borderColor: [
-                {{# each data.feelsLikeTemps}}
-                "{{temperatureColor temperature}}",
-                {{/each}}
-            ],
-            backgroundColor: [
-                {{# each data.feelsLikeTemps}}
-                "{{temperatureColor temperature}}",
-                {{/each}}
-            ],
+            borderColor: "#aaaaaa",
+            backgroundColor: "#aaaaaa",
             fill: false,
           }
         ],
