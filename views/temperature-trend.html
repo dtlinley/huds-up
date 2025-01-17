@@ -36,7 +36,11 @@
               {{/each}}
             ],
             borderColor: "#aaaaaa",
-            backgroundColor: "#aaaaaa",
+            backgroundColor: [
+                {{# each data.realTemps}}
+                "{{temperatureColor temperature}}",
+                {{/each}}
+            ],
             fill: false,
           }
         ],
