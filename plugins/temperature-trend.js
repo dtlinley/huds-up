@@ -14,28 +14,31 @@ const register = (server) => {
     path: '/plugins/temperature-trend',
     handler: async () => {
       const stationId = process.env.WEATHER_STATION_ID;
-      const url = `https://dd.weather.gc.ca/citypage_weather/xml/ON/${stationId}.xml`;
+      const url = `https://weather.gc.ca/api/app/v3/en/Location/43.960,-78.296?type=city`;
       const payload = await cache.get(url);
-      const json = parser.toJson(payload, { object: true });
-      const weatherData = json.siteData;
-      const hourlyForecasts = weatherData.hourlyForecastGroup.hourlyForecast;
-      const forecasts = weatherData.forecastGroup.forecast;
+      const data = payload[0];
+      const hourlyForecasts = data.hourlyFcst.hourly;
+      const dailyForecasts = data.dailyFcst.daily;
 
-      const forecastHigh = parseInt(
-        forecasts.find((f) => f.temperatures.temperature.class === 'high')
-          .temperatures.temperature.$t,
-        10,
-      );
-      const forecastLow = parseInt(
-        forecasts.find((f) => f.temperatures.temperature.class === 'low')
-          .temperatures.temperature.$t,
-        10,
-      );
+      let forecastLow = NaN;
+      let forecastHigh = NaN;
+      hourlyForecasts.forEach((forecast) => {
+        const temperature = parseInt(forecast.temperature.metric, 10);
+
+        if (Number.isNaN(forecastLow) || temperature < forecastLow) {
+          forecastLow = temperature;
+        }
+
+        if (Number.isNaN(forecastHigh) || temperature > forecastHigh) {
+          forecastHigh = temperature;
+        }
+      });
+
       const response = {
         priority: 0,
         type: 'temperature-trend',
         data: {
-          message: forecasts[0].textSummary,
+          message: dailyForecasts[0].summary,
           maxTemp: forecastHigh,
           minTemp: forecastLow,
         },
@@ -44,13 +47,11 @@ const register = (server) => {
       const feelsLikeTemps = hourlyForecasts.map(
         (forecast) => {
           const tempReading = {
-            temperature: forecast.temperature.$t,
-            time: forecast.dateTimeUTC,
+            temperature: forecast.temperature.metric,
+            time: forecast.epochTime,
           };
-          if (forecast.windChill.$t) {
-            tempReading.temperature = forecast.windChill.$t;
-          } else if (forecast.humidex.$t) {
-            tempReading.temperature = forecast.humidex.$t;
+          if (forecast.feelsLike.metric) {
+            tempReading.temperature = forecast.feelsLike.metric;
           }
           tempReading.temperature = parseInt(tempReading.temperature, 10);
           return tempReading;
@@ -61,8 +62,8 @@ const register = (server) => {
       const realTemps = hourlyForecasts.map(
         (forecast) => {
           const tempReading = {
-            temperature: forecast.temperature.$t,
-            time: forecast.dateTimeUTC,
+            temperature: forecast.temperature.metric,
+            time: forecast.epochTime,
           };
           tempReading.temperature = parseInt(tempReading.temperature, 10);
           return tempReading;

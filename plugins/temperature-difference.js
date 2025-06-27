@@ -38,26 +38,36 @@ const register = (server) => {
       const response = { priority: 0, type: 'temperature-difference', data: {} };
 
       const stationId = process.env.WEATHER_STATION_ID;
-      const url = `https://dd.weather.gc.ca/citypage_weather/xml/ON/${stationId}.xml`;
+      const url = `https://weather.gc.ca/api/app/v3/en/Location/43.960,-78.296?type=city`;
 
       return cache.get(url).then((payload) => {
-        const json = parser.toJson(payload, { object: true });
-        const weatherData = json.siteData;
-        const hourlyForecasts = weatherData.hourlyForecastGroup.hourlyForecast;
-        const forecasts = weatherData.forecastGroup.forecast;
-        const yesterday = weatherData.yesterdayConditions;
+        const data = payload[0]
+        const hourlyForecasts = data?.hourlyFcst?.hourly;
+        const dailyForecasts = data?.dailyFcst?.daily;
+        const yesterday = data?.pastHourly?.hours;
 
         if (!yesterday) {
           return response;
         }
 
-        const yesterdayHigh = parseInt(yesterday.temperature.find((t) => t.class === 'high').$t, 10);
-        const yesterdayLow = parseInt(yesterday.temperature.find((t) => t.class === 'low').$t, 10);
+        let yesterdayHigh = NaN;
+        let yesterdayLow = NaN;
+        yesterday.forEach((forecast) => {
+          const temperature = parseInt(forecast.temperature, 10);
+
+          if (Number.isNaN(yesterdayLow) || temperature < yesterdayLow) {
+            yesterdayLow = temperature;
+          }
+
+          if (Number.isNaN(yesterdayHigh) || temperature > yesterdayHigh) {
+            yesterdayHigh = temperature;
+          }
+        });
 
         let forecastLow = NaN;
         let forecastHigh = NaN;
         hourlyForecasts.forEach((forecast) => {
-          const temperature = parseInt(forecast.temperature.$t, 10);
+          const temperature = parseInt(forecast.temperature.metric, 10);
 
           if (Number.isNaN(forecastLow) || temperature < forecastLow) {
             forecastLow = temperature;
@@ -68,7 +78,7 @@ const register = (server) => {
           }
         });
 
-        response.data.message = forecasts[0].textSummary;
+        response.data.message = dailyForecasts[0].summary;
         response.data.yesterday = {
           high: yesterdayHigh,
           low: yesterdayLow,

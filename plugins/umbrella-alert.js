@@ -1,7 +1,5 @@
 'use strict';
 
-// const wreck = require('wreck').defaults({ json: true });
-const parser = require('xml2json');
 const cache = require('../cache');
 
 // the number of forecasts to consider; users generally don't care about whether an umbrella is
@@ -15,52 +13,50 @@ const register = (server) => {
   server.route({
     method: 'GET',
     path: '/plugins/umbrella-alert',
-    handler: () => {
+    handler: async () => {
       const stationId = process.env.WEATHER_STATION_ID;
-      const url = `https://dd.weather.gc.ca/citypage_weather/xml/ON/${stationId}.xml`;
-      return cache.get(url).then((payload) => {
-        const json = parser.toJson(payload, { object: true });
-        const weatherData = json.siteData;
-        const forecasts = weatherData.forecastGroup.forecast;
-        const hourlyForecasts = weatherData.hourlyForecastGroup.hourlyForecast;
-        const response = {
-          priority: 0,
-          type: 'umbrella-alert',
-          data: { message: forecasts[0].textSummary },
-        };
-
-        const precip = hourlyForecasts.map(
-          (forecast) => ({ percentage: forecast.lop.$t, time: forecast.dateTimeUTC }),
-        );
-        response.data.rain = precip;
-
-        const importance = (data, max, depression) => {
-          if (data.length <= 0 || max <= 0) {
-            return 0;
-          }
-
-          const amount = Math.min(data[0].percentage / HIGH_RAIN_THRESHOLD, 1);
-          const current = (amount * max) / depression;
-          const nextMax = max - (INITIAL_IMPORTANCE / FORECAST_RELEVANCE);
-          const nextDepression = ((amount * (DEPRESSION_FACTOR - 1)) + 1) * depression;
-          return current + importance(data.slice(1), nextMax, nextDepression);
-        };
-
-        const priority = importance(response.data.rain, INITIAL_IMPORTANCE, 1);
-        if (priority < 2) {
-          response.priority = 2;
-        } else {
-          response.priority = priority;
-        }
-        return response;
-      }).catch((err) => ({
-        priority: 60,
+      const url = `https://weather.gc.ca/api/app/v3/en/Location/43.960,-78.296?type=city`;
+      const payload = await cache.get(url)
+      const data = payload[0]
+      const dailyForecasts = data.dailyFcst.daily;
+      const hourlyForecasts = data.hourlyFcst.hourly;
+      const response = {
+        priority: 0,
         type: 'umbrella-alert',
-        data: {
-          error: err,
-          message: 'Could not fetch data',
+        data: { message: dailyForecasts[0].summary },
+      };
+
+      const precip = hourlyForecasts.map(
+        (forecast) => {
+          const date = new Date(forecast.epochTime * 1000)
+          let dateString = date.toLocaleTimeString();
+          if (date.getHours() === 0) {
+            dateString = date.toDateString();
+          }
+          return{ percentage: parseInt(forecast.precip, 10), time: dateString }
         },
-      }));
+      );
+      response.data.rain = precip;
+
+      const importance = (data, max, depression) => {
+        if (data.length <= 0 || max <= 0) {
+          return 0;
+        }
+
+        const amount = Math.min(data[0].percentage / HIGH_RAIN_THRESHOLD, 1);
+        const current = (amount * max) / depression;
+        const nextMax = max - (INITIAL_IMPORTANCE / FORECAST_RELEVANCE);
+        const nextDepression = ((amount * (DEPRESSION_FACTOR - 1)) + 1) * depression;
+        return current + importance(data.slice(1), nextMax, nextDepression);
+      };
+
+      const priority = importance(response.data.rain, INITIAL_IMPORTANCE, 1);
+      if (priority < 2) {
+        response.priority = 2;
+      } else {
+        response.priority = priority;
+      }
+      return response;
     },
   });
 };

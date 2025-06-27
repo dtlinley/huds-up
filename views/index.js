@@ -29,6 +29,13 @@ const register = (server) => {
     const date = new Date(time * 1000);
     return date.toDateString();
   });
+  handlebars.registerHelper('timeStringFromTime', (time) => {
+    const date = new Date(time * 1000);
+    if (date.getHours() === 0) {
+      return date.toDateString();
+    }
+    return date.toLocaleTimeString();
+  })
   handlebars.registerHelper('formatDate', (date) => date.toDateString());
   handlebars.registerHelper('round', (number) => Math.round(number));
   handlebars.registerHelper('isNegative', (number) => number < 0);

@@ -9,7 +9,7 @@ var precipitation = new Chart(ctx, {
     data: {
       labels: [
         {{#each data.rain}}
-        "{{toTimeString this.time}}",
+        "{{this.time}}",
         {{/each}}
       ],
       datasets: [

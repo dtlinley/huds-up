@@ -9,7 +9,7 @@
       data: {
         labels: [
           {{#each data.realTemps}}
-          "{{toTimeString this.time}}",
+          "{{timeStringFromTime this.time}}",
           {{/each}}
         ],
         datasets: [
