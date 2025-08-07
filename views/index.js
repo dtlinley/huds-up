@@ -13,6 +13,7 @@ const register = (server) => {
   registerPartial('umbrella-alert');
   registerPartial('nagbot');
   registerPartial('temperature-trend');
+  registerPartial('air-quality');
 
   handlebars.registerHelper('percent', (number) => Math.floor(number * 100));
   handlebars.registerHelper('toTimeString', (time) => {
