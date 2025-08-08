@@ -71,7 +71,7 @@ const register = (server) => {
       );
       response.data.realTemps = realTemps;
 
-      const yesterdayTemps = data.pastHourly.hours.map(
+      const yesterdayTemps = data.pastHourly.hours.reverse().map(
         (forecast) => {
           const tempReading = {
             temperature: forecast.temperature,
