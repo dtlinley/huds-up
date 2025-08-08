@@ -71,6 +71,17 @@ const register = (server) => {
       );
       response.data.realTemps = realTemps;
 
+      const yesterdayTemps = data.pastHourly.hours.map(
+        (forecast) => {
+          const tempReading = {
+            temperature: forecast.temperature,
+            time: forecast.timeStamp,
+          };
+          return tempReading;
+        },
+      );
+      response.data.yesterdayTemps = yesterdayTemps;
+
       response.data.currentTemp = realTemps[0].temperature;
 
       const idealMinDiff = Math.abs(forecastLow - IDEAL_TEMP_MIN);

@@ -42,6 +42,17 @@
                 {{/each}}
             ],
             fill: false,
+          },
+          {
+            label: 'Yesterday (C)',
+            data: [
+              {{#each data.yesterdayTemps}}
+              {{temperature}},
+              {{/each}}
+            ],
+            borderColor: "#dddddd",
+            backgroundColor: "#dddddd",
+            fill: false,
           }
         ],
       },
