@@ -25,10 +25,9 @@
           {{> (lookup . 'type') data=data}}
         </div>
       </section>
-      {{/each}}
-      {{#unless plugins}}
+      {{else}}
       There was an error loading plugins. Please try again later.
-      {{/unless}}
+      {{/each}}
     </div>
   </body>
 </html>

@@ -2,7 +2,18 @@
     margin: 10px;
 }
 
-.aqhi-risk {
-    font-size: 3em;
+.quality-spectrum {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.quality-spectrum td {
+    height: 10px;
     text-align: center;
+    font-size: 1em;
+}
+
+.quality-spectrum td.active {
+    font-size: 3em;
+    font-weight: bold;
 }

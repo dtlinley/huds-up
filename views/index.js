@@ -94,6 +94,38 @@ const register = (server) => {
     },
   );
 
+  // Air quality
+  handlebars.registerHelper('qualitySpectrum', (currentStatus) => {
+    const greenToRedSpectrum = [
+      '#00ff00',
+      '#6bee00',
+      '#95db00',
+      '#b0c800',
+      '#c5b400',
+      '#d79f00',
+      '#e68700',
+      '#f46900',
+      '#fc4700',
+      '#ff0000',
+    ];
+    let ret = '<table class="quality-spectrum">';
+    let topRow = '<tr>'
+    let bottomRow = '<tr>'
+    for (let i = 1; i <= 10; i++) {
+      if (i === parseInt(currentStatus, 10)) {
+        topRow += '<td class="active" style="background:' + greenToRedSpectrum[i-1] + '"></td>'
+        bottomRow += '<td class="active">' + i + '</td>'
+      } else {
+        topRow += '<td style="background:' + greenToRedSpectrum[i-1] + '"></td>'
+        bottomRow += '<td>' + i + '</td>'
+      }
+    }
+    topRow += '</tr>'
+    bottomRow += '</tr>'
+    ret += topRow + bottomRow + '</table>'
+    return ret;
+  });
+
   handlebars.registerHelper('add', (a, b) => a + b);
 
   server.route({
