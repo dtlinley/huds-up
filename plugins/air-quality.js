@@ -29,7 +29,7 @@ const register = (server) => {
 
       response.priority = quality?.aqhiVal * 10
       if (quality?.aqhiVal <= 2) {
-        response.priority = 0
+        response.priority = 5
       }
 
       return response;
