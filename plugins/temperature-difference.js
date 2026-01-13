@@ -52,8 +52,14 @@ const register = (server) => {
 
         let yesterdayHigh = NaN;
         let yesterdayLow = NaN;
+        let yesterdayTotal = 0;
+        let yesterdayValid = 0;
         yesterday.forEach((forecast) => {
           const temperature = parseInt(forecast.temperature, 10);
+
+          if (isNaN(temperature)) {
+            return;
+          }
 
           if (Number.isNaN(yesterdayLow) || temperature < yesterdayLow) {
             yesterdayLow = temperature;
@@ -62,12 +68,20 @@ const register = (server) => {
           if (Number.isNaN(yesterdayHigh) || temperature > yesterdayHigh) {
             yesterdayHigh = temperature;
           }
+
+          yesterdayTotal += temperature;
+          yesterdayValid += 1
         });
 
         let forecastLow = NaN;
         let forecastHigh = NaN;
+        let forecastTotal = 0;
+        let forecastValid = 0;
         hourlyForecasts.forEach((forecast) => {
           const temperature = parseInt(forecast.temperature.metric, 10);
+          if (isNaN(temperature)) {
+            return;
+          }
 
           if (Number.isNaN(forecastLow) || temperature < forecastLow) {
             forecastLow = temperature;
@@ -76,26 +90,30 @@ const register = (server) => {
           if (Number.isNaN(forecastHigh) || temperature > forecastHigh) {
             forecastHigh = temperature;
           }
+
+          forecastTotal += temperature;
+          forecastValid += 1;
         });
 
         response.data.message = dailyForecasts[0].summary;
         response.data.yesterday = {
           high: yesterdayHigh,
           low: yesterdayLow,
+          average: yesterdayTotal / yesterdayValid,
         };
         response.data.forecast = {
           high: forecastHigh,
           low: forecastLow,
+          average: forecastTotal / yesterdayValid,
         };
 
-        const minTempDiff = forecastLow - yesterdayLow;
-        const maxTempDiff = forecastHigh - yesterdayHigh;
+        const avgTempDiff = (forecastTotal / forecastValid) - (yesterdayTotal / yesterdayValid)
 
         const delta = Math.min(
           1,
-          (Math.abs(minTempDiff) + Math.abs(maxTempDiff)) / LARGE_TEMPERATURE_DIFFERENCE,
+          Math.abs(avgTempDiff) / LARGE_TEMPERATURE_DIFFERENCE,
         );
-        response.data.averageTemperatureDifference = (minTempDiff + maxTempDiff) / 2;
+        response.data.averageTemperatureDifference = avgTempDiff;
 
         const idealMinDiff = Math.abs(forecastLow - IDEAL_TEMP_MIN);
         const idealMaxDiff = Math.abs(forecastHigh - IDEAL_TEMP_MAX);
